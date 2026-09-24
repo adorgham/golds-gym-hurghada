@@ -1,0 +1,61 @@
+{
+  "name": "ClassSession",
+  "type": "object",
+  "properties": {
+    "class_id": {
+      "type": "string"
+    },
+    "class_name": {
+      "type": "string"
+    },
+    "trainer_id": {
+      "type": "string"
+    },
+    "trainer_name": {
+      "type": "string"
+    },
+    "day_of_week": {
+      "type": "string",
+      "enum": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ]
+    },
+    "start_time": {
+      "type": "string"
+    },
+    "duration_minutes": {
+      "type": "number"
+    },
+    "difficulty": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "capacity": {
+      "type": "number"
+    },
+    "spaces_taken": {
+      "type": "number",
+      "default": 0
+    },
+    "room": {
+      "type": "string"
+    },
+    "is_recurring": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "class_name",
+    "day_of_week",
+    "start_time"
+  ]
+}

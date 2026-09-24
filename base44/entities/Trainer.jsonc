@@ -1,0 +1,88 @@
+{
+  "name": "Trainer",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "photo_url": {
+      "type": "string"
+    },
+    "years_experience": {
+      "type": "number"
+    },
+    "certifications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "specializations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "expertise_areas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "client_focus": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "training_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "philosophy": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "string"
+    },
+    "availability": {
+      "type": "string"
+    },
+    "instagram_url": {
+      "type": "string"
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "display_order": {
+      "type": "number",
+      "default": 0
+    },
+    "seo_title": {
+      "type": "string"
+    },
+    "seo_description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "slug",
+    "title"
+  ]
+}

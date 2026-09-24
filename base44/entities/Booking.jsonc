@@ -1,0 +1,57 @@
+{
+  "name": "Booking",
+  "type": "object",
+  "properties": {
+    "trainer_id": {
+      "type": "string"
+    },
+    "trainer_name": {
+      "type": "string"
+    },
+    "preferred_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "preferred_time": {
+      "type": "string"
+    },
+    "training_goal": {
+      "type": "string"
+    },
+    "is_member": {
+      "type": "boolean",
+      "default": false
+    },
+    "name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "whatsapp": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "source_page": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "New",
+        "Contacted",
+        "Confirmed",
+        "Completed",
+        "Cancelled"
+      ],
+      "default": "New"
+    }
+  },
+  "required": [
+    "trainer_name",
+    "name",
+    "phone"
+  ]
+}

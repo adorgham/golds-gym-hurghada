@@ -1,0 +1,47 @@
+{
+  "name": "FitnessClass",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "Beginner",
+        "Intermediate",
+        "Advanced",
+        "All Levels"
+      ]
+    },
+    "duration_minutes": {
+      "type": "number"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
+    "seo_title": {
+      "type": "string"
+    },
+    "seo_description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "slug",
+    "category"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "whatsapp": {
+      "type": "string"
+    },
+    "product": {
+      "type": "string"
+    },
+    "service": {
+      "type": "string"
+    },
+    "trainer": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "source_page": {
+      "type": "string"
+    },
+    "campaign": {
+      "type": "string"
+    },
+    "lead_type": {
+      "type": "string",
+      "enum": [
+        "membership",
+        "pass",
+        "trainer_booking",
+        "contact",
+        "tour",
+        "callback",
+        "whatsapp"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "New",
+        "Contacted",
+        "Qualified",
+        "Converted",
+        "Lost"
+      ],
+      "default": "New"
+    }
+  },
+  "required": [
+    "name",
+    "lead_type"
+  ]
+}

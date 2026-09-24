@@ -1,0 +1,86 @@
+{
+  "name": "Article",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "section": {
+      "type": "string",
+      "enum": [
+        "blog",
+        "fitness-guides",
+        "workouts",
+        "fitness-tips"
+      ]
+    },
+    "category": {
+      "type": "string"
+    },
+    "excerpt": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "cover_image_url": {
+      "type": "string"
+    },
+    "author_name": {
+      "type": "string"
+    },
+    "trainer_id": {
+      "type": "string"
+    },
+    "difficulty": {
+      "type": "string"
+    },
+    "duration_minutes": {
+      "type": "number"
+    },
+    "goal": {
+      "type": "string"
+    },
+    "equipment": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "target_muscle_groups": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "published_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "seo_title": {
+      "type": "string"
+    },
+    "seo_description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "slug",
+    "section",
+    "content"
+  ]
+}

@@ -6,6 +6,21 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
+import Layout from '@/components/Layout';
+import Home from '@/pages/Home';
+import Memberships from '@/pages/Memberships';
+import Passes from '@/pages/Passes';
+import PassDetail from '@/pages/PassDetail';
+import Trainers from '@/pages/Trainers';
+import TrainerDetail from '@/pages/TrainerDetail';
+import ClassSchedule from '@/pages/ClassSchedule';
+import PersonalTraining from '@/pages/PersonalTraining';
+import Facilities from '@/pages/Facilities';
+import About from '@/pages/About';
+import Contact from '@/pages/Contact';
+import ArticleList from '@/pages/ArticleList';
+import ArticleDetail from '@/pages/ArticleDetail';
+import Admin from '@/pages/Admin';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -34,7 +49,28 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/memberships" element={<Memberships />} />
+        <Route path="/passes" element={<Passes />} />
+        <Route path="/passes/:slug" element={<PassDetail />} />
+        <Route path="/trainers" element={<Trainers />} />
+        <Route path="/trainers/:slug" element={<TrainerDetail />} />
+        <Route path="/classes/schedule" element={<ClassSchedule />} />
+        <Route path="/personal-training" element={<PersonalTraining />} />
+        <Route path="/facilities" element={<Facilities />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/blog" element={<ArticleList section="blog" />} />
+        <Route path="/blog/:slug" element={<ArticleDetail />} />
+        <Route path="/fitness-guides" element={<ArticleList section="fitness-guides" />} />
+        <Route path="/fitness-guides/:slug" element={<ArticleDetail />} />
+        <Route path="/workouts" element={<ArticleList section="workouts" />} />
+        <Route path="/workouts/:slug" element={<ArticleDetail />} />
+        <Route path="/fitness-tips" element={<ArticleList section="fitness-tips" />} />
+        <Route path="/fitness-tips/:slug" element={<ArticleDetail />} />
+        <Route path="/admin" element={<Admin />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
