@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo } from "@/lib/seo";
-import { Users, Calendar, FileText, UserCog, TrendingUp, Mail } from "lucide-react";
+import { Users, Calendar, FileText, Image, UserCog, TrendingUp, Mail } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import MembersSection from "@/components/admin/MembersSection";
+import MediaLibrary from "@/components/admin/MediaLibrary";
 
 const TABS = [
   { id: "leads", label: "Leads", icon: Mail },
@@ -12,6 +13,7 @@ const TABS = [
   { id: "trainers", label: "Trainers", icon: UserCog },
   { id: "members", label: "Members", icon: TrendingUp },
   { id: "memberships", label: "Memberships", icon: TrendingUp },
+  { id: "media", label: "Media", icon: Image },
   { id: "passes", label: "Passes", icon: Users },
   { id: "articles", label: "Content", icon: FileText },
 ];
@@ -46,10 +48,11 @@ export default function Admin() {
       base44.entities.Trainer.list().catch(() => []),
       base44.entities.Membership.list().catch(() => []),
       base44.entities.Member.list().catch(() => []),
+      base44.entities.MediaAsset.list().catch(() => []),
       base44.entities.Pass.list().catch(() => []),
       base44.entities.Article.list("-created_date").catch(() => []),
-    ]).then(([leads, bookings, trainers, memberships, members, passes, articles]) => {
-      setData({ leads, bookings, trainers, memberships, members, passes, articles });
+    ]).then(([leads, bookings, trainers, memberships, members, media, passes, articles]) => {
+      setData({ leads, bookings, trainers, memberships, members, media, passes, articles });
       setLoading(false);
     });
   }, [user?.role]);
@@ -67,6 +70,7 @@ export default function Admin() {
     trainers: data.trainers?.length || 0,
     members: data.members?.length || 0,
     memberships: data.memberships?.length || 0,
+    media: data.media?.length || 0,
     passes: data.passes?.length || 0,
     articles: data.articles?.length || 0,
   };
@@ -172,6 +176,8 @@ export default function Admin() {
                 {(data.memberships || []).length === 0 && <tr><td className="p-8 text-white/30 text-center">No memberships configured.</td></tr>}
               </Table>
             )}
+
+            {tab === "media" && <MediaLibrary />}
 
             {tab === "passes" && (
               <Table headers={["Name","Price","Days","Recommended","Slug"]}>
