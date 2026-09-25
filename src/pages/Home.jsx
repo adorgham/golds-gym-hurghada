@@ -88,7 +88,7 @@ export default function Home() {
           <Reveal delay={350}>
             <div className="mt-9 flex flex-wrap gap-4">
               <Link to="/memberships" onClick={() => track(EVENTS.membershipSelect, { location: "hero" })}
-              className="group inline-flex items-center gap-2 bg-gold font-heading tracking-wide px-8 py-4 hover:brightness-110 transition-all clip-tag text-[hsl(var(--background))]">
+              className="group inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-8 py-4 hover:brightness-110 transition-all clip-tag">
                 JOIN GOLD'S GYM
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
