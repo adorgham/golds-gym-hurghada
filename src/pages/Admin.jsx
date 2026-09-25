@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo } from "@/lib/seo";
-import { Users, Calendar, FileText, UserCog, TrendingUp, Mail, Phone, MessageCircle } from "lucide-react";
+import { Users, Calendar, FileText, UserCog, TrendingUp, Mail } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
+import MembersSection from "@/components/admin/MembersSection";
 
 const TABS = [
   { id: "leads", label: "Leads", icon: Mail },
   { id: "bookings", label: "Bookings", icon: Calendar },
   { id: "trainers", label: "Trainers", icon: UserCog },
-  { id: "memberships", label: "Memberships", icon: TrendingUp },
+  { id: "members", label: "Members", icon: TrendingUp },
   { id: "passes", label: "Passes", icon: Users },
   { id: "articles", label: "Content", icon: FileText },
 ];
@@ -26,23 +28,30 @@ const STATUS_COLORS = {
 
 export default function Admin() {
   useSeo({ title: "Admin — CMS", description: "Staff dashboard", noindex: true });
+  const { user } = useAuth();
   const [tab, setTab] = useState("leads");
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (user?.role !== "admin") {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     Promise.all([
       base44.entities.Lead.list("-created_date").catch(() => []),
       base44.entities.Booking.list("-created_date").catch(() => []),
       base44.entities.Trainer.list().catch(() => []),
       base44.entities.Membership.list().catch(() => []),
+      base44.entities.Member.list().catch(() => []),
       base44.entities.Pass.list().catch(() => []),
       base44.entities.Article.list("-created_date").catch(() => []),
-    ]).then(([leads, bookings, trainers, memberships, passes, articles]) => {
-      setData({ leads, bookings, trainers, memberships, passes, articles });
+    ]).then(([leads, bookings, trainers, memberships, members, passes, articles]) => {
+      setData({ leads, bookings, trainers, memberships, members, passes, articles });
       setLoading(false);
     });
-  }, []);
+  }, [user?.role]);
 
   const updateStatus = async (entity, id, status) => {
     try {
@@ -55,10 +64,14 @@ export default function Admin() {
     leads: data.leads?.length || 0,
     bookings: data.bookings?.length || 0,
     trainers: data.trainers?.length || 0,
-    memberships: data.memberships?.length || 0,
+    members: data.members?.length || 0,
     passes: data.passes?.length || 0,
     articles: data.articles?.length || 0,
   };
+
+  if (user?.role !== "admin") {
+    return <div className="pt-32 min-h-screen px-5 text-center"><h1 className="font-heading text-4xl text-white">ADMIN ACCESS ONLY</h1><p className="mt-3 text-white/55">This area is restricted to Gold's Gym Hurghada administrators.</p><Link to="/" className="mt-6 inline-block text-gold hover:underline">← Back to site</Link></div>;
+  }
 
   return (
     <div className="pt-24 min-h-screen px-5 lg:px-10 pb-20">
@@ -141,20 +154,7 @@ export default function Admin() {
               </Table>
             )}
 
-            {tab === "memberships" && (
-              <Table headers={["Name","Price","Duration","Recommended","Featured"]}>
-                {(data.memberships || []).map((m) => (
-                  <tr key={m.id} className="border-t border-white/5 text-sm">
-                    <td className="p-3 text-white">{m.name}</td>
-                    <td className="p-3 text-gold font-heading">{m.price} {m.currency}</td>
-                    <td className="p-3 text-white/60">{m.duration}</td>
-                    <td className="p-3 text-white/60 text-xs">{m.recommended_for}</td>
-                    <td className="p-3 text-white/60 text-xs">{m.is_featured ? "★" : "—"}</td>
-                  </tr>
-                ))}
-                {(data.memberships || []).length === 0 && <tr><td className="p-8 text-white/30 text-center">No memberships configured.</td></tr>}
-              </Table>
-            )}
+            {tab === "members" && <MembersSection memberships={data.memberships || []} />}
 
             {tab === "passes" && (
               <Table headers={["Name","Price","Days","Recommended","Slug"]}>
