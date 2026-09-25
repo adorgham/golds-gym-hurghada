@@ -6,6 +6,16 @@ import { track, EVENTS, whatsappUrl } from "@/lib/site";
 import Reveal from "@/components/Reveal";
 import { ArrowRight, Check, Award, Globe, Clock, Instagram, Loader2, Calendar } from "lucide-react";
 
+function safeUrl(url) {
+  if (!url || typeof url !== "string") return null;
+  try {
+    const u = new URL(url, window.location.origin);
+    return u.protocol === "http:" || u.protocol === "https:" ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 const FALLBACK = {
   "ahmed-mohamed": { name: "Ahmed Mohamed", title: "Head Strength Coach", years_experience: 12, certifications: ["NSCA-CSCS","Precision Nutrition L1"], languages: ["Arabic","English"], specializations: ["Strength","Bodybuilding","Sports Performance"], expertise_areas: ["Powerlifting","Hypertrophy","Athletic Performance"], client_focus: ["Athletes","Advanced Lifters"], philosophy: "Strength is a skill. Master the basics, load progressively, and the body follows.", bio: "Ahmed has coached national-level powerlifters and bodybuilders for over a decade. His approach blends old-school iron with modern sports science.", availability: "Mon–Sat, mornings & evenings", instagram_url: "#" },
   "sara-hassan": { name: "Sara Hassan", title: "Women's Fitness Specialist", years_experience: 8, certifications: ["ACE Personal Trainer","Pre/Post-Natal Specialist"], languages: ["Arabic","English","French"], specializations: ["Women's Fitness","Weight Loss","Beginner Training"], expertise_areas: ["Fat Loss","Toning","Beginner Programming"], client_focus: ["Women","Beginners"], philosophy: "Sustainable results come from consistency, not extremes. We build habits that last.", bio: "Sara specializes in helping women build confidence and strength in a supportive environment. Her programs are designed for real life and long-term results.", availability: "Sun–Fri, flexible", instagram_url: "#" },
@@ -155,8 +165,8 @@ export default function TrainerDetail() {
               <div>
                 <h3 className="font-heading text-xl text-gold mb-3">LANGUAGES</h3>
                 <p className="text-white/65 text-sm">{(t.languages || []).join(", ")}</p>
-                {t.instagram_url && (
-                  <a href={t.instagram_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-gold text-sm mt-3 hover:underline">
+                {safeUrl(t.instagram_url) && (
+                  <a href={safeUrl(t.instagram_url)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-gold text-sm mt-3 hover:underline">
                     <Instagram className="w-4 h-4" /> Instagram
                   </a>
                 )}
