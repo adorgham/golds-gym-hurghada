@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube } from "lucide-react";
 import { PHONE, EMAIL, ADDRESS, whatsappUrl, track, EVENTS } from "@/lib/site";
+import GoldsLogo from "@/components/GoldsLogo";
 
 export default function Footer() {
   return (
     <footer className="bg-obsidian border-t border-white/10 mt-0">
       {/* Legacy ticker */}
-      <div className="border-y border-white/10 overflow-hidden py-4">
+      <div className="border-y border-brand-orange/30 overflow-hidden py-4 bg-brand-orange/5">
         <div className="flex gap-12 animate-marquee whitespace-nowrap">
           {Array.from({ length: 2 }).map((_, k) => (
             <div key={k} className="flex gap-12 items-center">
               {["THE MECCA OF FITNESS", "TRAIN STRONGER", "MOVE BETTER", "BECOME MORE", "HURGHADA", "EST. VENICE 1965", "REBORN ON THE RED SEA"].map((t) => (
-                <span key={t} className="font-heading text-2xl text-white/15 tracking-tight flex items-center gap-12">
+                <span key={t} className="font-heading text-2xl text-white/15 tracking-[0.04em] flex items-center gap-12 uppercase">
                   {t} <span className="text-gold">✦</span>
                 </span>
               ))}
@@ -22,13 +23,7 @@ export default function Footer() {
 
       <div className="max-w-[1400px] mx-auto px-5 lg:px-10 py-16 grid gap-12 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <div className="flex items-center gap-3 mb-5">
-            <span className="w-10 h-10 rounded-full bg-gold flex items-center justify-center font-heading text-obsidian text-lg">G</span>
-            <span>
-              <span className="block font-heading text-white text-lg">GOLD'S GYM</span>
-              <span className="block text-[10px] tracking-[0.3em] text-gold font-semibold">HURGHADA</span>
-            </span>
-          </div>
+          <GoldsLogo variant="full" size={44} className="mb-5" />
           <p className="text-white/55 text-sm leading-relaxed max-w-sm mb-6">
             The Mecca of Fitness on the Red Sea. Where champions are forged and ordinary becomes legendary. Train where fitness history lives.
           </p>
@@ -42,7 +37,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="font-heading text-gold text-sm tracking-wide mb-4">EXPLORE</h4>
+          <h4 className="font-heading text-gold text-sm tracking-[0.1em] mb-4 uppercase">Explore</h4>
           <ul className="space-y-2.5 text-sm text-white/55">
             <li><Link to="/memberships" className="hover:text-white">Memberships</Link></li>
             <li><Link to="/passes" className="hover:text-white">Passes</Link></li>
@@ -54,7 +49,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="font-heading text-gold text-sm tracking-wide mb-4">KNOWLEDGE</h4>
+          <h4 className="font-heading text-gold text-sm tracking-[0.1em] mb-4 uppercase">Knowledge</h4>
           <ul className="space-y-2.5 text-sm text-white/55">
             <li><Link to="/blog" className="hover:text-white">Blog</Link></li>
             <li><Link to="/fitness-guides" className="hover:text-white">Fitness Guides</Link></li>
@@ -66,7 +61,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="font-heading text-gold text-sm tracking-wide mb-4">CONTACT</h4>
+          <h4 className="font-heading text-gold text-sm tracking-[0.1em] mb-4 uppercase">Contact</h4>
           <ul className="space-y-3 text-sm text-white/55">
             <li className="flex gap-2.5"><MapPin className="w-4 h-4 text-gold mt-0.5 shrink-0" /> {ADDRESS}</li>
             <li className="flex gap-2.5"><Clock className="w-4 h-4 text-gold mt-0.5 shrink-0" /> Daily 06:00 – 24:00</li>

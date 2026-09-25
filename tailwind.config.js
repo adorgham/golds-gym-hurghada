@@ -44,6 +44,9 @@ module.exports = {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
+  			'brand-yellow': '#FFED00',
+  			'brand-orange': '#FF4500',
+  			'brand-teal': '#2C5454',
   			chart: {
   				'1': 'hsl(var(--chart-1))',
   				'2': 'hsl(var(--chart-2))',
@@ -63,9 +66,10 @@ module.exports = {
   			}
   		},
   		fontFamily: {
-  			heading: ['var(--font-heading)'],
-  			body: ['var(--font-body)'],
-  			display: ['var(--font-display)'],
+  			heading: ['"Bebas Neue"', '"Oswald"', 'system-ui', 'sans-serif'],
+  			body: ['"Inter"', 'system-ui', 'sans-serif'],
+  			display: ['"Bebas Neue"', '"Oswald"', 'system-ui', 'sans-serif'],
+  			serif: ['"Alfa Slab One"', '"Cooper Black"', 'Georgia', 'serif'],
   			mono: ['var(--font-mono)']
   		},
   		keyframes: {

@@ -10,25 +10,29 @@
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
-    --primary: 43 74% 49%;
-    --primary-foreground: 0 0% 6%;
+    --primary: 51 100% 50%;
+    --primary-foreground: 0 0% 4%;
     --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 58%;
-    --accent: 43 74% 49%;
-    --accent-foreground: 0 0% 6%;
+    --accent: 51 100% 50%;
+    --accent-foreground: 0 0% 4%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 16%;
     --input: 0 0% 16%;
-    --ring: 43 74% 49%;
+    --ring: 51 100% 50%;
     --radius: 0.25rem;
-    --gold: 43 74% 49%;
+    --gold: 51 100% 50%;
+    --brand-yellow: 51 100% 50%;
+    --brand-orange: 16 100% 50%;
+    --brand-teal: 180 31% 25%;
     --obsidian: 0 0% 4%;
     --iron: 0 0% 29%;
-    --font-heading: "Archivo Black", "Inter", system-ui, sans-serif;
-    --font-display: "Oswald", "Inter", system-ui, sans-serif;
+    --font-heading: "Bebas Neue", "Oswald", system-ui, sans-serif;
+    --font-display: "Bebas Neue", "Oswald", system-ui, sans-serif;
+    --font-serif: "Alfa Slab One", "Cooper Black", Georgia, serif;
     --font-body: "Inter", system-ui, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
@@ -41,37 +45,44 @@
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   body {
     @apply bg-background text-foreground font-body antialiased;
-    background-color: #0A0A0B;
+    background-color: #0A0A0A;
   }
-  ::selection { background: #D4AF37; color: #0A0A0B; }
+  ::selection { background: #FFED00; color: #0A0A0A; }
 }
 
 @layer utilities {
-  .font-heading { font-family: "Archivo Black", "Inter", system-ui, sans-serif; }
-  .font-display { font-family: "Oswald", "Inter", system-ui, sans-serif; }
-  .text-gold { color: #D4AF37; }
-  .bg-gold { background-color: #D4AF37; }
-  .border-gold { border-color: #D4AF37; }
-  .bg-obsidian { background-color: #0A0A0B; }
+  .font-heading { font-family: "Bebas Neue", "Oswald", system-ui, sans-serif; letter-spacing: 0.02em; }
+  .font-display { font-family: "Bebas Neue", "Oswald", system-ui, sans-serif; letter-spacing: 0.02em; }
+  .font-serif { font-family: "Alfa Slab One", "Cooper Black", Georgia, serif; }
+  .text-gold { color: #FFED00; }
+  .bg-gold { background-color: #FFED00; }
+  .border-gold { border-color: #FFED00; }
+  .bg-obsidian { background-color: #0A0A0A; }
+  .text-brand-orange { color: #FF4500; }
+  .bg-brand-orange { background-color: #FF4500; }
+  .border-brand-orange { border-color: #FF4500; }
+  .bg-brand-teal { background-color: #2C5454; }
+  .text-brand-teal { color: #2C5454; }
+  .border-brand-teal { border-color: #2C5454; }
   .text-balance { text-wrap: balance; }
 
   .gold-text {
-    background: linear-gradient(135deg, #F4D77A 0%, #D4AF37 45%, #A8821E 100%);
+    background: linear-gradient(135deg, #FFF07A 0%, #FFED00 45%, #C9A800 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .gold-line {
-    background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+    background: linear-gradient(90deg, transparent, #FFED00, transparent);
   }
 
   .shadow-box {
-    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(212,175,55,0.08);
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,237,0,0.12);
   }
 
   .glass {
-    background: rgba(10,10,11,0.6);
+    background: rgba(10,10,10,0.7);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
@@ -79,6 +90,15 @@
   .grain {
     background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
     background-size: 3px 3px;
+  }
+
+  .bg-teal-textured {
+    background-color: #2C5454;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px);
+    background-size: 4px 4px, 7px 7px;
+    background-position: 0 0, 2px 2px;
   }
 
   .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -119,12 +139,12 @@
     animation: scaleIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
   }
 
-  .prose-content h2 { font-family: "Archivo Black", sans-serif; font-size: 1.75rem; color: #fff; margin: 2rem 0 1rem; letter-spacing: -0.02em; }
-  .prose-content h3 { font-family: "Oswald", sans-serif; font-weight: 600; font-size: 1.25rem; color: #D4AF37; margin: 1.5rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .prose-content h2 { font-family: "Bebas Neue", sans-serif; font-size: 2rem; color: #fff; margin: 2rem 0 1rem; letter-spacing: 0.02em; }
+  .prose-content h3 { font-family: "Bebas Neue", sans-serif; font-weight: 400; font-size: 1.4rem; color: #FFED00; margin: 1.5rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
   .prose-content p { margin: 1rem 0; line-height: 1.7; }
   .prose-content ul { margin: 1rem 0; padding-left: 1.25rem; }
   .prose-content li { margin: 0.4rem 0; list-style: none; position: relative; padding-left: 1rem; }
-  .prose-content li::before { content: "✦"; position: absolute; left: 0; color: #D4AF37; font-size: 0.7rem; top: 0.4rem; }
+  .prose-content li::before { content: "✦"; position: absolute; left: 0; color: #FFED00; font-size: 0.7rem; top: 0.4rem; }
   .prose-content strong { color: #fff; }
   .prose-content ol { margin: 1rem 0; padding-left: 1.5rem; }
   .prose-content ol li { list-style: decimal; padding-left: 0; }

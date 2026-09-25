@@ -185,16 +185,16 @@ export default function Home() {
       </section>
 
       {/* TRAINING CATEGORIES */}
-      <section className="py-20 px-5 lg:px-10 bg-white/[0.015] border-y border-white/5">
+      <section className="py-20 px-5 lg:px-10 bg-teal-textured border-y border-white/10">
         <div className="max-w-[1400px] mx-auto">
           <SectionHeading eyebrow="Training Categories" title="CHOOSE YOUR" accent="DISCIPLINE" align="center" />
-          <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5">
+          <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10">
             {CATEGORIES.map((c, i) => (
               <Reveal key={c.name} delay={i * 60}>
-                <div className="group bg-obsidian p-8 h-full hover:bg-white/[0.03] transition-colors cursor-default">
+                <div className="group bg-teal-textured p-8 h-full hover:bg-white/[0.06] transition-colors cursor-default border border-white/5">
                   <c.icon className="w-8 h-8 text-gold mb-5 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-heading text-2xl text-white mb-2">{c.name}</h3>
-                  <p className="text-white/50 text-sm">{c.desc}</p>
+                  <h3 className="font-heading text-2xl text-white mb-2 tracking-[0.03em] uppercase">{c.name}</h3>
+                  <p className="text-white/60 text-sm">{c.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -232,7 +232,7 @@ export default function Home() {
       </section>
 
       {/* TRAINERS PREVIEW */}
-      <section className="py-24 px-5 lg:px-10 bg-white/[0.015] border-y border-white/5">
+      <section className="py-24 px-5 lg:px-10 bg-white/[0.02] border-y border-white/5">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-12">
             <SectionHeading eyebrow="The Titans" title="MEET THE" accent="TRAINERS" subtitle="Elite coaches. Proven results. Your transformation starts with the right mentor." />
@@ -266,10 +266,10 @@ export default function Home() {
       </section>
 
       {/* MEMBERSHIP CTA */}
-      <section className="relative py-32 px-5 lg:px-10 overflow-hidden">
+      <section className="relative py-32 px-5 lg:px-10 overflow-hidden bg-teal-textured">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c6e1f?auto=format&fit=crop&w=2000&q=80" alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-obsidian/85" />
+          <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c6e1f?auto=format&fit=crop&w=2000&q=80" alt="" className="w-full h-full object-cover opacity-30" />
+          <div className="absolute inset-0 bg-teal-textured/80" />
         </div>
         <div className="relative max-w-[1400px] mx-auto text-center">
           <Reveal>
