@@ -11,6 +11,7 @@ const TABS = [
   { id: "bookings", label: "Bookings", icon: Calendar },
   { id: "trainers", label: "Trainers", icon: UserCog },
   { id: "members", label: "Members", icon: TrendingUp },
+  { id: "memberships", label: "Memberships", icon: TrendingUp },
   { id: "passes", label: "Passes", icon: Users },
   { id: "articles", label: "Content", icon: FileText },
 ];
@@ -65,6 +66,7 @@ export default function Admin() {
     bookings: data.bookings?.length || 0,
     trainers: data.trainers?.length || 0,
     members: data.members?.length || 0,
+    memberships: data.memberships?.length || 0,
     passes: data.passes?.length || 0,
     articles: data.articles?.length || 0,
   };
@@ -155,6 +157,21 @@ export default function Admin() {
             )}
 
             {tab === "members" && <MembersSection memberships={data.memberships || []} />}
+
+            {tab === "memberships" && (
+              <Table headers={["Name","Price","Duration","Recommended","Featured"]}>
+                {(data.memberships || []).map((m) => (
+                  <tr key={m.id} className="border-t border-white/5 text-sm">
+                    <td className="p-3 text-white">{m.name}</td>
+                    <td className="p-3 text-gold font-heading">{m.price} {m.currency}</td>
+                    <td className="p-3 text-white/60">{m.duration}</td>
+                    <td className="p-3 text-white/60 text-xs">{m.recommended_for}</td>
+                    <td className="p-3 text-white/60 text-xs">{m.is_featured ? "★" : "—"}</td>
+                  </tr>
+                ))}
+                {(data.memberships || []).length === 0 && <tr><td className="p-8 text-white/30 text-center">No memberships configured.</td></tr>}
+              </Table>
+            )}
 
             {tab === "passes" && (
               <Table headers={["Name","Price","Days","Recommended","Slug"]}>

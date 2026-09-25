@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Archive, CalendarPlus, Pencil, Plus, Search, Snowflake, Users } from "lucide-react";
+import { Archive, CalendarPlus, Pencil, Plus, Search, Snowflake } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -28,7 +28,6 @@ function statusClass(status) {
 }
 
 export default function MembersSection({ memberships }) {
-  const [section, setSection] = useState("members");
   const [members, setMembers] = useState([]);
   const [terms, setTerms] = useState([]);
   const [freezes, setFreezes] = useState([]);
@@ -130,16 +129,10 @@ export default function MembersSection({ memberships }) {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-5 py-5">
-        <div><h2 className="font-heading text-2xl text-white">MEMBERSHIP MANAGEMENT</h2><p className="mt-1 text-sm text-white/45">Manage member records, membership terms and approved freezes.</p></div>
-        {section === "members" && <Button onClick={() => { setError(""); setMemberDialog({ member: null }); }} className="bg-gold text-obsidian hover:bg-gold/90"><Plus /> Add member</Button>}
+        <div><h2 className="font-heading text-2xl text-white">MEMBERS</h2><p className="mt-1 text-sm text-white/45">Manage member records, membership terms and approved freezes.</p></div>
+        <Button onClick={() => { setError(""); setMemberDialog({ member: null }); }} className="bg-gold text-obsidian hover:bg-gold/90"><Plus /> Add member</Button>
       </div>
-
-      <div className="flex gap-2 border-b border-white/10 px-5 pt-4">
-        <button onClick={() => setSection("members")} className={`border-b-2 px-4 pb-3 text-sm font-semibold ${section === "members" ? "border-gold text-gold" : "border-transparent text-white/50"}`}><Users className="mr-2 inline h-4 w-4" />Members</button>
-        <button onClick={() => setSection("plans")} className={`border-b-2 px-4 pb-3 text-sm font-semibold ${section === "plans" ? "border-gold text-gold" : "border-transparent text-white/50"}`}>Plans ({memberships.length})</button>
-      </div>
-
-      {section === "plans" ? <Plans memberships={memberships} /> : <>
+      <>
         <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-4">
           {["Active", "Frozen", "Expired", "Archived"].map((status) => <button key={status} onClick={() => setFilter(filter === status ? "All" : status)} className={`border p-3 text-left ${filter === status ? "border-gold bg-gold/10" : "border-white/10"}`}><p className="text-xs text-white/45">{status}</p><p className="font-heading text-2xl text-white">{counts[status] || 0}</p></button>)}
         </div>
@@ -151,7 +144,7 @@ export default function MembersSection({ memberships }) {
           {loading ? <tr><td colSpan="8" className="p-8 text-center text-white/35">Loading members…</td></tr> : filteredRows.map((row) => <tr key={row.member.id} className="border-b border-white/5 text-sm"><td className="p-3 text-white"><p>{row.member.full_name}</p><p className="text-xs text-white/40">{row.freezes.length} freeze{row.freezes.length === 1 ? "" : "s"}</p></td><td className="p-3 font-mono text-xs text-gold">{row.member.membership_number}</td><td className="p-3 text-xs text-white/60">{row.member.email}<br />{row.member.phone}</td><td className="p-3 text-white/60">{row.term?.plan_name || "—"}</td><td className="p-3 text-xs text-white/60">{formatDate(row.term?.start_date)}</td><td className="p-3 text-xs text-white/60">{formatDate(row.term?.expiry_date)}</td><td className="p-3"><span className={`rounded-full px-2 py-1 text-xs ${statusClass(row.status)}`}>{row.status}</span></td><td className="p-3"><div className="flex gap-1"><Button size="icon" variant="ghost" title="Edit member" onClick={() => { setError(""); setMemberDialog({ member: row.member }); }}><Pencil /></Button><Button size="icon" variant="ghost" title="Renew membership" disabled={row.status === "Archived"} onClick={() => { setError(""); setTermDialog({ member: row.member, term: row.term }); }}><CalendarPlus /></Button><Button size="icon" variant="ghost" title="Add freeze" disabled={!row.term || row.status === "Archived"} onClick={() => { setError(""); setFreezeDialog(row); }}><Snowflake /></Button><Button size="icon" variant="ghost" title="Archive member" disabled={row.status === "Archived"} onClick={() => archiveMember(row.member)}><Archive /></Button></div></td></tr>)}
           {!loading && filteredRows.length === 0 && <tr><td colSpan="8" className="p-8 text-center text-white/35">No members match this view.</td></tr>}
         </tbody></table></div>
-      </>}
+      </>
 
       <MemberDialog state={memberDialog} memberships={memberships} error={error} saving={saving} onOpenChange={setMemberDialog} onSubmit={saveMember} nextMembershipNumber={nextMembershipNumber()} />
       <TermDialog state={termDialog} memberships={memberships} error={error} saving={saving} onOpenChange={setTermDialog} onSubmit={saveTerm} />
@@ -159,8 +152,6 @@ export default function MembersSection({ memberships }) {
     </div>
   );
 }
-
-function Plans({ memberships }) { return <div className="overflow-x-auto"><table className="w-full"><thead><tr className="border-b border-white/10 text-left text-[10px] uppercase tracking-wide text-white/40"><th className="p-3">Plan</th><th className="p-3">Price</th><th className="p-3">Duration</th><th className="p-3">Recommended for</th></tr></thead><tbody>{memberships.map((plan) => <tr key={plan.id} className="border-b border-white/5 text-sm"><td className="p-3 text-white">{plan.name}</td><td className="p-3 text-gold">{plan.price} {plan.currency}</td><td className="p-3 text-white/60">{plan.duration}</td><td className="p-3 text-white/60">{plan.recommended_for || "—"}</td></tr>)}{memberships.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-white/35">No plans configured.</td></tr>}</tbody></table></div>; }
 
 function DialogShell({ open, onOpenChange, title, description, children }) { return <Dialog open={Boolean(open)} onOpenChange={onOpenChange}><DialogContent className="max-h-[90vh] overflow-y-auto border-white/15 bg-obsidian text-white"><DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription className="text-white/50">{description}</DialogDescription></DialogHeader>{children}</DialogContent></Dialog>; }
 function Field({ label, children }) { return <label className="block text-sm text-white/70"><span className="mb-1.5 block">{label}</span>{children}</label>; }
