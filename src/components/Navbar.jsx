@@ -103,7 +103,7 @@ export default function Navbar() {
 
           {/* Center: logo */}
           <Link to="/" className="flex items-center justify-center" aria-label="Gold's Gym Hurghada home">
-            <GoldsLogo variant="full" size={36} />
+            <GoldsLogo variant="full" size={46} />
           </Link>
 
           {/* Right: nav + find a club */}
