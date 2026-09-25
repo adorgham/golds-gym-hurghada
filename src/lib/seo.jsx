@@ -2,6 +2,8 @@ import { useEffect } from "react";
 
 const SITE_NAME = "Gold's Gym Hurghada";
 const DEFAULT_OG_IMAGE = "https://images.unsplash.com/photo-1534438327276-1ff8e2a4f5a3?auto=format&fit=crop&w=1200&q=80";
+// Keep the entire site out of search while it is under development.
+const SITE_WIDE_NOINDEX = true;
 
 function setMeta(attr, key, content) {
   if (!content) return;
@@ -49,8 +51,8 @@ export function useSeo({ title, description, canonical, image, jsonLd, noindex }
     setMeta("name", "twitter:title", fullTitle);
     setMeta("name", "twitter:description", description);
     setLink("canonical", canonical);
-    if (noindex) {
-      setMeta("name", "robots", "noindex, nofollow");
+    if (SITE_WIDE_NOINDEX || noindex) {
+      setMeta("name", "robots", "noindex, nofollow, noarchive, nosnippet");
     } else {
       const r = document.head.querySelector('meta[name="robots"]');
       if (r) r.remove();
