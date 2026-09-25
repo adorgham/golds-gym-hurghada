@@ -65,7 +65,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-obsidian/60" />
         </div>
 
-        <div className="relative max-w-[1400px] mx-auto px-5 lg:px-10 w-full pt-24 pb-16">
+        <div className="relative max-w-[1400px] mx-auto px-5 lg:px-10 w-full pt-32 pb-16">
           <Reveal>
             <div className="flex items-center gap-3 mb-6">
               <span className="h-px w-12 bg-gold" />
@@ -73,7 +73,7 @@ export default function Home() {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <h1 className="font-heading text-[15vw] sm:text-8xl lg:text-[9rem] leading-[0.85] tracking-tighter text-white">
+            <h1 className="font-heading text-[10.5vw] sm:text-[4.2rem] lg:text-[6.3rem] leading-[0.85] tracking-tighter text-white">
               BORN IN<br />
               <span className="gold-text">VENICE.</span><br />
               REBORN IN<br />
@@ -82,7 +82,7 @@ export default function Home() {
           </Reveal>
           <Reveal delay={250}>
             <p className="mt-7 text-lg sm:text-xl text-white/70 max-w-xl font-light">
-              Train stronger. Move better. Become more. The legendary Gold's Gym experience, now on the Red Sea.
+              Train stronger. Move better. Become more. The legendary Gold's Gym experience, in Hurghada.
             </p>
           </Reveal>
           <Reveal delay={350}>
