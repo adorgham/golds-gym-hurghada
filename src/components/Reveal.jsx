@@ -23,12 +23,12 @@ export default function Reveal({ children, className = "", delay = 0, as: Tag = 
   return (
     <Tag
       ref={ref}
-      className={`${className} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-      }`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
+      className={`${className} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] text-[hsl(var(--background))] ${
+      shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`
+      }
+      style={{ transitionDelay: `${delay}ms` }}>
+      
       {children}
-    </Tag>
-  );
+    </Tag>);
+
 }
