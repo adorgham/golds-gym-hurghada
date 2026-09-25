@@ -12,20 +12,20 @@ const HERO_IMG = "https://images.unsplash.com/photo-1534438327276-1ff8e2a4f5a3?a
 const EXPERIENCE_IMG = "https://images.unsplash.com/photo-1571902943202-507ec2610f02?auto=format&fit=crop&w=1600&q=80";
 
 const CATEGORIES = [
-  { name: "Bodybuilding", icon: Dumbbell, desc: "Build mass, sculpt symmetry, train like a champion." },
-  { name: "Strength", icon: Zap, desc: "Move heavy iron. Build raw, functional power." },
-  { name: "Functional", icon: Activity, desc: "Train movement patterns for real-world athleticism." },
-  { name: "Cardio", icon: Heart, desc: "Engineer endurance. Burn fat. Forge conditioning." },
-  { name: "Group Training", icon: Users, desc: "Energy of the pack. Classes that push you further." },
-  { name: "Personal Training", icon: Flame, desc: "One-on-one coaching tailored to your goal." },
-];
+{ name: "Bodybuilding", icon: Dumbbell, desc: "Build mass, sculpt symmetry, train like a champion." },
+{ name: "Strength", icon: Zap, desc: "Move heavy iron. Build raw, functional power." },
+{ name: "Functional", icon: Activity, desc: "Train movement patterns for real-world athleticism." },
+{ name: "Cardio", icon: Heart, desc: "Engineer endurance. Burn fat. Forge conditioning." },
+{ name: "Group Training", icon: Users, desc: "Energy of the pack. Classes that push you further." },
+{ name: "Personal Training", icon: Flame, desc: "One-on-one coaching tailored to your goal." }];
+
 
 export default function Home() {
   useSeo({
     title: "The Mecca of Fitness",
     description: "Gold's Gym Hurghada — train stronger, move better, become more. Memberships, day passes, group classes and elite personal trainers on the Red Sea.",
     canonical: "https://goldsgymhurghada.com/",
-    jsonLd: organizationLd,
+    jsonLd: organizationLd
   });
 
   const [memberships, setMemberships] = useState([]);
@@ -36,12 +36,12 @@ export default function Home() {
 
   useEffect(() => {
     Promise.all([
-      base44.entities.Membership.list().catch(() => []),
-      base44.entities.Pass.list("display_order").catch(() => []),
-      base44.entities.Trainer.filter({ is_featured: true }).catch(() => base44.entities.Trainer.list().catch(() => [])),
-      base44.entities.ClassSession.list().catch(() => []),
-      base44.entities.Article.filter({ is_featured: true }).catch(() => base44.entities.Article.list("-published_date", 4).catch(() => [])),
-    ]).then(([m, p, t, s, a]) => {
+    base44.entities.Membership.list().catch(() => []),
+    base44.entities.Pass.list("display_order").catch(() => []),
+    base44.entities.Trainer.filter({ is_featured: true }).catch(() => base44.entities.Trainer.list().catch(() => [])),
+    base44.entities.ClassSession.list().catch(() => []),
+    base44.entities.Article.filter({ is_featured: true }).catch(() => base44.entities.Article.list("-published_date", 4).catch(() => []))]
+    ).then(([m, p, t, s, a]) => {
       setMemberships(m || []);
       setPasses(p || []);
       setTrainers(t || []);
@@ -51,9 +51,9 @@ export default function Home() {
   }, []);
 
   const quickOptions = [
-    ...memberships.map((m) => ({ ...m, kind: "membership", to: `/memberships`, price: m.price, label: m.name })),
-    ...passes.map((p) => ({ ...p, kind: "pass", to: `/passes/${p.slug}`, price: p.price, label: p.days === 1 ? "Day Pass" : `${p.days}-Day Pass` })),
-  ].slice(0, 5);
+  ...memberships.map((m) => ({ ...m, kind: "membership", to: `/memberships`, price: m.price, label: m.name })),
+  ...passes.map((p) => ({ ...p, kind: "pass", to: `/passes/${p.slug}`, price: p.price, label: p.days === 1 ? "Day Pass" : `${p.days}-Day Pass` }))].
+  slice(0, 5);
 
   return (
     <div>
@@ -88,7 +88,7 @@ export default function Home() {
           <Reveal delay={350}>
             <div className="mt-9 flex flex-wrap gap-4">
               <Link to="/memberships" onClick={() => track(EVENTS.membershipSelect, { location: "hero" })}
-                className="group inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-8 py-4 hover:brightness-110 transition-all clip-tag">
+              className="group inline-flex items-center gap-2 bg-gold font-heading tracking-wide px-8 py-4 hover:brightness-110 transition-all clip-tag text-[hsl(var(--foreground))]">
                 JOIN GOLD'S GYM
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -96,7 +96,7 @@ export default function Home() {
                 EXPLORE MEMBERSHIPS
               </Link>
               <Link to="/passes/day-pass" onClick={() => track(EVENTS.passView, { pass: "day-pass", location: "hero" })}
-                className="inline-flex items-center text-white/70 font-semibold hover:text-gold transition-colors px-2">
+              className="inline-flex items-center text-white/70 font-semibold hover:text-gold transition-colors px-2">
                 Get a Day Pass →
               </Link>
             </div>
@@ -115,25 +115,25 @@ export default function Home() {
               <span className="text-xs tracking-[0.2em] text-gold font-semibold uppercase">One day or every day</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              {quickOptions.length === 0 ? (
-                <>
-                  {[["Monthly","/memberships"],["Day Pass","/passes/day-pass"],["3-Day","/passes/3-day-pass"],["5-Day","/passes/5-day-pass"],["7-Day","/passes/7-day-pass"]].map(([l, to]) => (
-                    <Link key={l} to={to} className="group border border-white/10 p-4 hover:border-gold hover:bg-gold/5 transition-all">
+              {quickOptions.length === 0 ?
+              <>
+                  {[["Monthly", "/memberships"], ["Day Pass", "/passes/day-pass"], ["3-Day", "/passes/3-day-pass"], ["5-Day", "/passes/5-day-pass"], ["7-Day", "/passes/7-day-pass"]].map(([l, to]) =>
+                <Link key={l} to={to} className="group border border-white/10 p-4 hover:border-gold hover:bg-gold/5 transition-all">
                       <div className="text-[10px] tracking-[0.2em] text-gold font-semibold uppercase mb-1">{to.includes("memberships") ? "Resident" : "Visitor"}</div>
                       <div className="font-heading text-lg text-white group-hover:text-gold">{l}</div>
                       <div className="text-xs text-white/40 mt-1">Tap to view →</div>
                     </Link>
-                  ))}
-                </>
-              ) : quickOptions.map((o) => (
-                <Link key={o.to + o.label} to={o.to}
-                  onClick={() => track(o.kind === "membership" ? EVENTS.membershipView : EVENTS.passView, { location: "quick_selector", item: o.label })}
-                  className="group border border-white/10 p-4 hover:border-gold hover:bg-gold/5 transition-all">
+                )}
+                </> :
+              quickOptions.map((o) =>
+              <Link key={o.to + o.label} to={o.to}
+              onClick={() => track(o.kind === "membership" ? EVENTS.membershipView : EVENTS.passView, { location: "quick_selector", item: o.label })}
+              className="group border border-white/10 p-4 hover:border-gold hover:bg-gold/5 transition-all">
                   <div className="text-[10px] tracking-[0.2em] text-gold font-semibold uppercase mb-1">{o.kind === "membership" ? "Resident" : "Visitor"}</div>
                   <div className="font-heading text-lg text-white group-hover:text-gold">{o.label}</div>
                   {o.price != null && <div className="text-sm text-white/50 mt-1">{o.price} {o.currency || "EGP"}</div>}
                 </Link>
-              ))}
+              )}
             </div>
           </div>
         </Reveal>
@@ -147,15 +147,15 @@ export default function Home() {
               eyebrow="The Experience"
               title="AN ARCHITECTURE OF"
               accent="STRENGTH"
-              subtitle="Step into a training environment engineered for results. Every zone, every plate, every meter is built to push you past your limits."
-            />
+              subtitle="Step into a training environment engineered for results. Every zone, every plate, every meter is built to push you past your limits." />
+            
             <div className="mt-10 grid grid-cols-3 gap-6">
               {[
-                { v: 2000, s: "+", l: "m² Training Floor" },
-                { v: 80, s: "+", l: "Machines" },
-                { v: 24, s: "/7", l: "Open Daily" },
-              ].map((stat) => (
-                <Reveal key={stat.l}>
+              { v: 2000, s: "+", l: "m² Training Floor" },
+              { v: 80, s: "+", l: "Machines" },
+              { v: 24, s: "/7", l: "Open Daily" }].
+              map((stat) =>
+              <Reveal key={stat.l}>
                   <div className="border-l-2 border-gold pl-4">
                     <div className="font-heading text-4xl lg:text-5xl text-white">
                       <AnimatedCounter value={stat.v} suffix={stat.s} />
@@ -163,7 +163,7 @@ export default function Home() {
                     <div className="text-xs text-white/50 mt-1 uppercase tracking-wide">{stat.l}</div>
                   </div>
                 </Reveal>
-              ))}
+              )}
             </div>
             <Reveal delay={200}>
               <Link to="/facilities" className="mt-10 inline-flex items-center gap-2 text-gold font-heading tracking-wide hover:gap-3 transition-all">
@@ -189,15 +189,15 @@ export default function Home() {
         <div className="max-w-[1400px] mx-auto">
           <SectionHeading eyebrow="Training Categories" title="CHOOSE YOUR" accent="DISCIPLINE" align="center" />
           <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10">
-            {CATEGORIES.map((c, i) => (
-              <Reveal key={c.name} delay={i * 60}>
+            {CATEGORIES.map((c, i) =>
+            <Reveal key={c.name} delay={i * 60}>
                 <div className="group bg-teal-textured p-8 h-full hover:bg-white/[0.06] transition-colors cursor-default border border-white/5">
                   <c.icon className="w-8 h-8 text-gold mb-5 group-hover:scale-110 transition-transform" />
                   <h3 className="font-heading text-2xl text-white mb-2 tracking-[0.03em] uppercase">{c.name}</h3>
                   <p className="text-white/60 text-sm">{c.desc}</p>
                 </div>
               </Reveal>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -213,20 +213,20 @@ export default function Home() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {(sessions.length ? sessions.slice(0, 4) : [
-              { class_name: "BODY PUMP", day_of_week: "Tuesday", start_time: "18:00", trainer_name: "Coach", difficulty: "Intermediate" },
-              { class_name: "SPINNING", day_of_week: "Wednesday", start_time: "07:00", trainer_name: "Coach", difficulty: "All Levels" },
-              { class_name: "YOGA FLOW", day_of_week: "Thursday", start_time: "19:30", trainer_name: "Coach", difficulty: "Beginner" },
-              { class_name: "FUNCTIONAL HIIT", day_of_week: "Friday", start_time: "10:00", trainer_name: "Coach", difficulty: "Advanced" },
-            ]).map((s, i) => (
-              <Reveal key={i} delay={i * 70}>
+            { class_name: "BODY PUMP", day_of_week: "Tuesday", start_time: "18:00", trainer_name: "Coach", difficulty: "Intermediate" },
+            { class_name: "SPINNING", day_of_week: "Wednesday", start_time: "07:00", trainer_name: "Coach", difficulty: "All Levels" },
+            { class_name: "YOGA FLOW", day_of_week: "Thursday", start_time: "19:30", trainer_name: "Coach", difficulty: "Beginner" },
+            { class_name: "FUNCTIONAL HIIT", day_of_week: "Friday", start_time: "10:00", trainer_name: "Coach", difficulty: "Advanced" }]).
+            map((s, i) =>
+            <Reveal key={i} delay={i * 70}>
                 <Link to="/classes/schedule" onClick={() => track(EVENTS.classView, { class: s.class_name, location: "home_preview" })}
-                  className="group block border border-white/10 p-5 hover:border-gold hover:bg-gold/5 transition-all h-full">
+              className="group block border border-white/10 p-5 hover:border-gold hover:bg-gold/5 transition-all h-full">
                   <div className="text-[10px] tracking-[0.2em] text-gold font-semibold uppercase mb-3">{s.day_of_week} · {s.start_time}</div>
                   <h3 className="font-heading text-xl text-white group-hover:text-gold mb-2">{s.class_name}</h3>
                   <div className="text-xs text-white/40">{s.trainer_name || "TBA"} · {s.difficulty || "All Levels"}</div>
                 </Link>
               </Reveal>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -242,15 +242,15 @@ export default function Home() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {(trainers.length ? trainers.slice(0, 4) : [
-              { name: "Ahmed Mohamed", title: "Head Strength Coach", slug: "ahmed-mohamed", specializations: ["Strength","Bodybuilding"] },
-              { name: "Sara Hassan", title: "Women's Fitness Specialist", slug: "sara-hassan", specializations: ["Weight Loss","Women's Fitness"] },
-              { name: "Omar Khalil", title: "Functional Training Coach", slug: "omar-khalil", specializations: ["Functional","Mobility"] },
-              { name: "Lina Farouk", title: "Yoga & Mobility Coach", slug: "lina-farouk", specializations: ["Mobility","Recovery"] },
-            ]).map((t, i) => (
-              <Reveal key={t.slug || i} delay={i * 70}>
+            { name: "Ahmed Mohamed", title: "Head Strength Coach", slug: "ahmed-mohamed", specializations: ["Strength", "Bodybuilding"] },
+            { name: "Sara Hassan", title: "Women's Fitness Specialist", slug: "sara-hassan", specializations: ["Weight Loss", "Women's Fitness"] },
+            { name: "Omar Khalil", title: "Functional Training Coach", slug: "omar-khalil", specializations: ["Functional", "Mobility"] },
+            { name: "Lina Farouk", title: "Yoga & Mobility Coach", slug: "lina-farouk", specializations: ["Mobility", "Recovery"] }]).
+            map((t, i) =>
+            <Reveal key={t.slug || i} delay={i * 70}>
                 <Link to={t.slug ? `/trainers/${t.slug}` : "/trainers"}
-                  onClick={() => track(EVENTS.trainerView, { trainer: t.name, location: "home_preview" })}
-                  className="group block">
+              onClick={() => track(EVENTS.trainerView, { trainer: t.name, location: "home_preview" })}
+              className="group block">
                   <div className="aspect-[3/4] overflow-hidden bg-white/5 mb-4 relative">
                     {t.photo_url && <img src={t.photo_url} alt={t.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />}
                     {!t.photo_url && <div className="w-full h-full flex items-center justify-center text-white/20 font-heading text-6xl">{t.name.charAt(0)}</div>}
@@ -260,7 +260,7 @@ export default function Home() {
                   <p className="text-xs text-white/45">{t.title}</p>
                 </Link>
               </Reveal>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -278,7 +278,7 @@ export default function Home() {
               ONE DAY OR<br /><span className="gold-text">EVERY DAY.</span><br />START HERE.
             </h2>
             <Link to="/memberships" onClick={() => track(EVENTS.membershipSelect, { location: "home_cta" })}
-              className="mt-10 inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-10 py-5 hover:brightness-110 transition-all clip-tag">
+            className="mt-10 inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-10 py-5 hover:brightness-110 transition-all clip-tag">
               CHOOSE YOUR MEMBERSHIP <ArrowRight className="w-5 h-5" />
             </Link>
           </Reveal>
@@ -296,10 +296,10 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {(articles.length ? articles.slice(0, 3) : [
-              { title: "The Push Day Blueprint", slug: "push-day-workout", section: "workouts", excerpt: "A complete push workout for strength and hypertrophy.", category: "Strength" },
-              { title: "Nutrition for Fat Loss: A No-Nonsense Guide", slug: "nutrition-fat-loss", section: "fitness-guides", excerpt: "How to structure your diet to shed fat without losing muscle.", category: "Nutrition" },
-              { title: "5 Mobility Drills Every Lifter Needs", slug: "mobility-drills", section: "fitness-tips", excerpt: "Move better, lift heavier, stay injury-free.", category: "Mobility" },
-            ]).map((a, i) => {
+            { title: "The Push Day Blueprint", slug: "push-day-workout", section: "workouts", excerpt: "A complete push workout for strength and hypertrophy.", category: "Strength" },
+            { title: "Nutrition for Fat Loss: A No-Nonsense Guide", slug: "nutrition-fat-loss", section: "fitness-guides", excerpt: "How to structure your diet to shed fat without losing muscle.", category: "Nutrition" },
+            { title: "5 Mobility Drills Every Lifter Needs", slug: "mobility-drills", section: "fitness-tips", excerpt: "Move better, lift heavier, stay injury-free.", category: "Mobility" }]).
+            map((a, i) => {
               const to = `/${a.section}/${a.slug}`;
               return (
                 <Reveal key={a.slug || i} delay={i * 80}>
@@ -311,8 +311,8 @@ export default function Home() {
                     <h3 className="font-heading text-xl text-white group-hover:text-gold leading-tight">{a.title}</h3>
                     <p className="text-white/45 text-sm mt-2">{a.excerpt}</p>
                   </Link>
-                </Reveal>
-              );
+                </Reveal>);
+
             })}
           </div>
         </div>
@@ -322,13 +322,13 @@ export default function Home() {
       <section className="px-5 lg:px-10 pb-24">
         <Reveal className="max-w-[1400px] mx-auto">
           <a href={whatsappUrl("Hi Gold's Gym Hurghada, I'd like to know more.")} target="_blank" rel="noreferrer"
-            onClick={() => track(EVENTS.whatsappClick, { location: "home_strip" })}
-            className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gold text-obsidian p-6 lg:p-8 clip-tag hover:brightness-105 transition-all">
+          onClick={() => track(EVENTS.whatsappClick, { location: "home_strip" })}
+          className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gold text-obsidian p-6 lg:p-8 clip-tag hover:brightness-105 transition-all">
             <span className="font-heading text-2xl lg:text-3xl tracking-tight">TALK TO US ON WHATSAPP</span>
             <span className="font-heading text-sm tracking-wide flex items-center gap-2">CHAT NOW <ArrowRight className="w-5 h-5" /></span>
           </a>
         </Reveal>
       </section>
-    </div>
-  );
+    </div>);
+
 }
