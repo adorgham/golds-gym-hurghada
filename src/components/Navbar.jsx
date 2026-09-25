@@ -48,7 +48,6 @@ export default function Navbar() {
       <div className="bg-brand-orange text-white">
         <div className="max-w-[1400px] mx-auto px-5 lg:px-10 flex items-center justify-between py-1.5">
           <span className="text-[10px] sm:text-[11px] font-heading tracking-[0.15em] uppercase">The Mecca of</span>
-          <GoldsLogo variant="badge" size={22} className="flex justify-center" />
           <span className="text-[10px] sm:text-[11px] font-heading tracking-[0.15em] uppercase">Body Building™</span>
         </div>
       </div>
