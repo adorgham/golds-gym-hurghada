@@ -191,7 +191,7 @@ export default function Home() {
           <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10">
             {CATEGORIES.map((c, i) =>
             <Reveal key={c.name} delay={i * 60}>
-                <div className="group bg-teal-textured p-8 h-full hover:bg-white/[0.06] transition-colors cursor-default border border-white/5">
+                <div className="group bg-teal-card p-8 h-full hover:bg-white/[0.06] transition-colors cursor-default border border-white/5">
                   <c.icon className="w-8 h-8 text-gold mb-5 group-hover:scale-110 transition-transform" />
                   <h3 className="font-heading text-2xl text-white mb-2 tracking-[0.03em] uppercase">{c.name}</h3>
                   <p className="text-white/60 text-sm">{c.desc}</p>
@@ -267,10 +267,6 @@ export default function Home() {
 
       {/* MEMBERSHIP CTA */}
       <section className="relative py-32 px-5 lg:px-10 overflow-hidden bg-teal-textured">
-        <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c6e1f?auto=format&fit=crop&w=2000&q=80" alt="" className="w-full h-full object-cover opacity-30" />
-          <div className="absolute inset-0 bg-teal-textured/80" />
-        </div>
         <div className="relative max-w-[1400px] mx-auto text-center">
           <Reveal>
             <p className="text-gold text-xs font-bold tracking-[0.35em] uppercase mb-5">Your strongest version starts here</p>
