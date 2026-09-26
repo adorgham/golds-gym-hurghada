@@ -95,19 +95,10 @@
 
   .bg-teal-textured {
     background-color: #2C5454;
-    background-image: url("https://base44.app/api/apps/6ab5b45befa75c84051ba92f/files/mp/public/6ab5b45befa75c84051ba92f/a3c02508a_background8e6ffa41f5649394d286.webp");
+    background-image: url("./assets/teal-background.webp");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-  }
-
-  .bg-teal-card {
-    background-color: #2C5454;
-    background-image:
-      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px);
-    background-size: 4px 4px, 7px 7px;
-    background-position: 0 0, 2px 2px;
   }
 
   .hide-scrollbar::-webkit-scrollbar { display: none; }
