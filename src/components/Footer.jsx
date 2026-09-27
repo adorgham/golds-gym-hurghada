@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube } from "lucide-react";
 import { PHONE, EMAIL, ADDRESS, whatsappUrl, track, EVENTS } from "@/lib/site";
 import GoldsLogo from "@/components/GoldsLogo";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 
 export default function Footer() {
   return (
@@ -77,14 +78,14 @@ export default function Footer() {
             </li>
             <li>
               <a href={whatsappUrl()} target="_blank" rel="noreferrer" onClick={() => track(EVENTS.whatsappClick, { location: "footer" })} className="inline-flex items-center gap-2 mt-1 text-gold font-semibold">
-                WhatsApp Us →
+                <WhatsAppIcon className="w-4 h-4" /> WhatsApp Us →
               </a>
             </li>
           </ul>
         </div>
       </div>
 
-      <div className="border-t border-white/10 py-6">
+      <div className="border-t border-white/10 py-6 pb-20 lg:pb-6">
         <div className="max-w-[1400px] mx-auto px-5 lg:px-10 flex flex-col sm:flex-row gap-3 justify-between text-xs text-white/35">
           <p>© {new Date().getFullYear()} Gold's Gym Hurghada. All rights reserved.</p>
           <div className="flex gap-5">

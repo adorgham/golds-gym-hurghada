@@ -12,7 +12,6 @@ export default function Layout() {
       </main>
       <Footer />
       <MobileActionBar />
-      <div className="lg:hidden h-14" aria-hidden />
     </div>
   );
 }

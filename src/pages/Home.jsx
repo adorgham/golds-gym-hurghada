@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, organizationLd } from "@/lib/seo";
 import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import SectionHeading from "@/components/SectionHeading";
@@ -323,7 +324,7 @@ export default function Home() {
           <a href={whatsappUrl("Hi Gold's Gym Hurghada, I'd like to know more.")} target="_blank" rel="noreferrer"
           onClick={() => track(EVENTS.whatsappClick, { location: "home_strip" })}
           className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gold text-obsidian p-6 lg:p-8 clip-tag hover:brightness-105 transition-all">
-            <span className="font-heading text-2xl lg:text-3xl tracking-tight text-[hsl(var(--background))]">TALK TO US ON WHATSAPP</span>
+            <span className="font-heading text-2xl lg:text-3xl tracking-tight text-[hsl(var(--background))] flex items-center gap-3"><WhatsAppIcon className="w-7 h-7" /> TALK TO US ON WHATSAPP</span>
             <span className="font-heading text-sm tracking-wide flex items-center gap-2 text-[hsl(var(--background))]">CHAT NOW <ArrowRight className="w-5 h-5" /></span>
           </a>
         </Reveal>

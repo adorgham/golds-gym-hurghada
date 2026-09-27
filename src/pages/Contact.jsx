@@ -3,7 +3,8 @@ import { track, EVENTS, PHONE, EMAIL, ADDRESS, whatsappUrl } from "@/lib/site";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import LeadForm from "@/components/LeadForm";
-import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 
 export default function Contact() {
   useSeo({
@@ -25,7 +26,7 @@ export default function Contact() {
         <div className="max-w-[1400px] mx-auto grid lg:grid-cols-3 gap-4">
           {[
             { icon: Phone, label: "Call Us", value: PHONE, href: `tel:${PHONE}`, event: EVENTS.phoneClick },
-            { icon: MessageCircle, label: "WhatsApp", value: "Chat now", href: whatsappUrl(), event: EVENTS.whatsappClick, ext: true },
+            { icon: WhatsAppIcon, label: "WhatsApp", value: "Chat now", href: whatsappUrl(), event: EVENTS.whatsappClick, ext: true },
             { icon: Mail, label: "Email", value: EMAIL, href: `mailto:${EMAIL}`, event: EVENTS.emailClick },
           ].map((c) => (
             <Reveal key={c.label}>
@@ -74,7 +75,7 @@ function LinkLike({ href, label, ext }) {
     <a href={href} target={ext ? "_blank" : undefined} rel={ext ? "noreferrer" : undefined}
       onClick={() => track(EVENTS.leadSubmit, { lead_type: label.toLowerCase().includes("tour") ? "tour" : "callback", source: "contact_page" })}
       className="flex items-center justify-between border border-white/10 px-4 py-3 hover:border-gold hover:text-gold text-white/70 transition-all">
-      <span className="font-heading text-sm">{label}</span>
+      <span className="flex items-center gap-2 font-heading text-sm"><WhatsAppIcon className="w-4 h-4 text-gold" /> {label}</span>
       <span>→</span>
     </a>
   );

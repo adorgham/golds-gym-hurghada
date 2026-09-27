@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import { ArrowRight, Target, Users, TrendingUp, Heart } from "lucide-react";
@@ -37,7 +38,7 @@ export default function PersonalTraining() {
               BROWSE TRAINERS <ArrowRight className="w-4 h-4" />
             </Link>
             <a href={whatsappUrl("Hi, I'd like to know about personal training.")} target="_blank" rel="noreferrer" onClick={() => track(EVENTS.whatsappClick, { location: "pt_hero" })} className="inline-flex items-center border border-white/20 text-white font-heading tracking-wide px-8 py-4 hover:border-gold hover:text-gold transition-all">
-              TALK ON WHATSAPP
+              <WhatsAppIcon className="w-4 h-4" /> TALK ON WHATSAPP
             </a>
           </div>
         </div>

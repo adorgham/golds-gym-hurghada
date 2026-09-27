@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
 import LeadForm from "@/components/LeadForm";
 import { Check, X, ArrowRight, Clock } from "lucide-react";
@@ -69,7 +70,7 @@ export default function PassDetail() {
               <a href={whatsappUrl(`Hi, I'd like to buy the ${p.name} (${p.price} ${p.currency || "EGP"}).`)} target="_blank" rel="noreferrer"
                 onClick={() => track(EVENTS.passSelect, { pass: slug, location: "pass_detail" })}
                 className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-8 py-4 hover:brightness-110 transition-all clip-tag">
-                BUY THIS PASS <ArrowRight className="w-4 h-4" />
+                <WhatsAppIcon className="w-4 h-4" /> BUY THIS PASS <ArrowRight className="w-4 h-4" />
               </a>
               <Link to="/facilities" className="inline-flex items-center border border-white/20 text-white font-heading tracking-wide px-8 py-4 hover:border-gold hover:text-gold transition-all">
                 SEE FACILITIES

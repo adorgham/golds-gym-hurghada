@@ -2,6 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { track, EVENTS, whatsappUrl } from "@/lib/site";
 import { Send, Loader2, Check } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 
 export default function LeadForm({
   leadType = "contact",
@@ -57,7 +58,7 @@ export default function LeadForm({
         <a href={whatsappUrl("Hi, I just submitted a request on your website.")} target="_blank" rel="noreferrer"
           onClick={() => track(EVENTS.whatsappClick, { location: "lead_form_success" })}
           className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading px-6 py-3 clip-tag">
-          Open WhatsApp
+          <WhatsAppIcon className="w-4 h-4" /> Open WhatsApp
         </a>
       </div>
     );

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import LeadForm from "@/components/LeadForm";
@@ -78,8 +79,8 @@ export default function Memberships() {
                   </Link>
                   <a href={whatsappUrl(`Hi, I'm interested in the ${m.name}.`)} target="_blank" rel="noreferrer"
                     onClick={() => track(EVENTS.whatsappClick, { location: "membership_card", membership: m.name })}
-                    className="block text-center text-sm text-white/55 hover:text-gold py-1.5">
-                    Ask on WhatsApp →
+                    className="flex items-center justify-center gap-1.5 text-sm text-white/55 hover:text-gold py-1.5">
+                    <WhatsAppIcon className="w-4 h-4" /> Ask on WhatsApp →
                   </a>
                 </div>
               </div>
