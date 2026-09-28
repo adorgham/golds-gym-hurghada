@@ -4,6 +4,18 @@ Use this repository to run and edit the app locally, then publish changes back t
 
 Any change pushed to the repo will also be reflected in the Base44 Builder.
 
+## Project Documentation
+
+This repository contains the Gold’s Gym Hurghada website and shared backend work.
+
+For project scope, delivery milestones, architecture, and feature requirements, use:
+
+- `PROJECT.md` — project kickoff, launch scope, milestone sequence, and definition of done.
+- `AGENTS.md` — repository/Codex working instructions and document-routing rules.
+- `docs/` — governing architecture, SEO/AIO, and specialized feature specifications.
+
+The current business priority is the **production launch of the marketing website**. Future member/app capabilities should remain compatible with the shared backend but must not delay launch unless they are genuine dependencies.
+
 ## Prerequisites
 
 1. Clone the repository using the project's Git URL.
