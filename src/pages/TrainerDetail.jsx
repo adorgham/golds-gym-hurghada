@@ -5,6 +5,7 @@ import { useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, whatsappUrl } from "@/lib/site";
 import Reveal from "@/components/Reveal";
 import { ArrowRight, Check, Award, Globe, Clock, Instagram, Loader2, Calendar } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 
 function safeUrl(url) {
   if (!url || typeof url !== "string") return null;
@@ -105,8 +106,8 @@ export default function TrainerDetail() {
               </a>
               <a href={whatsappUrl(`Hi, I'd like to ask about training with ${t.name}.`)} target="_blank" rel="noreferrer"
                 onClick={() => track(EVENTS.whatsappClick, { location: "trainer_hero", trainer: t.name })}
-                className="inline-flex items-center border border-white/20 text-white font-heading tracking-wide px-7 py-4 hover:border-gold hover:text-gold transition-all">
-                ASK ABOUT THIS TRAINER
+                className="inline-flex items-center gap-2 border border-white/20 text-white font-heading tracking-wide px-7 py-4 hover:border-gold hover:text-gold transition-all">
+                <WhatsAppIcon className="w-4 h-4" /> ASK ABOUT THIS TRAINER
               </a>
             </div>
           </Reveal>
@@ -182,7 +183,7 @@ export default function TrainerDetail() {
                   <div className="w-14 h-14 rounded-full bg-gold/15 flex items-center justify-center mx-auto mb-4"><Check className="w-7 h-7 text-gold" /></div>
                   <h3 className="font-heading text-2xl text-white mb-2">Booking Request Sent</h3>
                   <p className="text-white/55 text-sm mb-5">{t.name} will contact you to confirm your session.</p>
-                  <a href={whatsappUrl(`Hi, I just booked a session with ${t.name}.`)} target="_blank" rel="noreferrer" className="inline-flex bg-gold text-obsidian font-heading px-6 py-3 clip-tag">Open WhatsApp</a>
+                  <a href={whatsappUrl(`Hi, I just booked a session with ${t.name}.`)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading px-6 py-3 clip-tag"><WhatsAppIcon className="w-4 h-4" /> Open WhatsApp</a>
                 </div>
               ) : (
                 <>

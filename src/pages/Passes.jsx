@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import { Check, ArrowRight, Clock, MapPin } from "lucide-react";
@@ -79,7 +80,7 @@ export default function Passes() {
             </div>
             <a href={whatsappUrl("Hi, I'd like to buy a gym pass.")} target="_blank" rel="noreferrer" onClick={() => track(EVENTS.whatsappClick, { location: "passes_info" })}
               className="flex items-center gap-3 hover:text-gold">
-              <div className="w-10 h-10 rounded-full bg-gold/15 flex items-center justify-center text-gold font-heading">G</div>
+              <div className="w-10 h-10 rounded-full bg-gold/15 flex items-center justify-center text-gold"><WhatsAppIcon className="w-5 h-5" /></div>
               <div><div className="text-white font-semibold text-sm">Buy on WhatsApp</div><div className="text-white/40 text-xs">Fast & easy</div></div>
             </a>
           </div>
