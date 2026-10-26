@@ -5,6 +5,8 @@ import { useSeo, breadcrumbsLd } from "@/lib/seo";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import { ArrowRight } from "lucide-react";
+import ContentState from "@/components/ContentState";
+import { publishedOnly } from "@/lib/content";
 
 const META = {
   "blog": { title: "Blog", accent: "BLOG", eyebrow: "Fitness Journal", desc: "News, stories and insights from Gold's Gym Hurghada." },
@@ -13,25 +15,25 @@ const META = {
   "fitness-tips": { title: "Fitness Tips", accent: "TIPS", eyebrow: "Quick Wins", desc: "Bite-sized advice to improve your training, nutrition and recovery." },
 };
 
-const FALLBACK = {
-  "blog": [{ title: "Welcome to the Mecca of Fitness", slug: "welcome-mecca", section: "blog", excerpt: "Why Gold's Gym Hurghada is your training home on the Red Sea.", category: "News" }],
-  "fitness-guides": [{ title: "Nutrition for Fat Loss: A No-Nonsense Guide", slug: "nutrition-fat-loss", section: "fitness-guides", excerpt: "How to structure your diet to shed fat without losing muscle.", category: "Nutrition" }],
-  "workouts": [{ title: "The Push Day Blueprint", slug: "push-day-workout", section: "workouts", excerpt: "A complete push workout for strength and hypertrophy.", category: "Strength", difficulty: "Intermediate", duration_minutes: 60, target_muscle_groups: ["Chest","Shoulders","Triceps"] }],
-  "fitness-tips": [{ title: "5 Mobility Drills Every Lifter Needs", slug: "mobility-drills", section: "fitness-tips", excerpt: "Move better, lift heavier, stay injury-free.", category: "Mobility" }],
-};
-
 export default function ArticleList({ section: sectionProp }) {
   const { section: sectionParam } = useParams();
   const section = sectionProp || sectionParam;
   const meta = META[section] || META["blog"];
   const [items, setItems] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    base44.entities.Article.filter({ section }).then(setItems).catch(() => setItems([]));
+    setLoading(true);
+    setFailed(false);
+    base44.entities.Article.filter({ section })
+      .then((records) => setItems(publishedOnly(records)))
+      .catch(() => { setItems([]); setFailed(true); })
+      .finally(() => setLoading(false));
   }, [section]);
 
-  const list = items.length ? items : (FALLBACK[section] || []);
+  const list = items;
   const categories = ["All", ...new Set(list.map((a) => a.category).filter(Boolean))];
   const filtered = filter === "All" ? list : list.filter((a) => a.category === filter);
 
@@ -61,6 +63,8 @@ export default function ArticleList({ section: sectionProp }) {
       )}
 
       <section className="px-5 lg:px-10 pb-24">
+        {loading && <p className="py-20 text-center text-white/40">Loading…</p>}
+        {!loading && list.length === 0 && <div className="max-w-[1400px] mx-auto"><ContentState title={failed ? "Content temporarily unavailable" : "New content is coming soon"} message="No approved articles have been published in this section yet." /></div>}
         <div className="max-w-[1400px] mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((a, i) => (
             <Reveal key={a.slug || i} delay={(i % 3) * 80}>
@@ -77,7 +81,7 @@ export default function ArticleList({ section: sectionProp }) {
             </Reveal>
           ))}
         </div>
-        {filtered.length === 0 && <p className="text-center text-white/40 py-20">No articles yet — check back soon.</p>}
+        {!loading && list.length > 0 && filtered.length === 0 && <p className="text-center text-white/40 py-20">No articles match this filter.</p>}
       </section>
     </div>
   );

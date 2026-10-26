@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Calendar, Zap } from "lucide-react";
-import { whatsappUrl, track, EVENTS } from "@/lib/site";
+import { Calendar, MessageCircle, Zap } from "lucide-react";
+import { HAS_WHATSAPP, whatsappUrl, track, EVENTS } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 
 export default function MobileActionBar() {
@@ -22,7 +22,7 @@ export default function MobileActionBar() {
           <Calendar className="w-5 h-5" />
           <span className="text-[10px] font-heading tracking-[0.1em]">SCHEDULE</span>
         </Link>
-        <a
+        {HAS_WHATSAPP ? <a
           href={whatsappUrl()}
           target="_blank"
           rel="noreferrer"
@@ -31,7 +31,7 @@ export default function MobileActionBar() {
         >
           <WhatsAppIcon className="w-5 h-5" />
           <span className="text-[10px] font-heading tracking-[0.1em]">WHATSAPP</span>
-        </a>
+        </a> : <Link to="/contact" className="flex flex-col items-center gap-0.5 py-3 text-white/80"><MessageCircle className="w-5 h-5" /><span className="text-[10px] font-heading tracking-[0.1em]">CONTACT</span></Link>}
       </div>
     </div>
   );

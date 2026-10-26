@@ -1,6 +1,6 @@
 # Gold's Gym Hurghada — Delivery Plan to GTM
 
-**Status:** Sprint 1 in progress
+**Status:** Sprint 2 implemented locally; content approval and staging UAT pending
 
 **Planning basis:** repository audit completed 2026-10-26
 
@@ -68,12 +68,16 @@ Local results on 2026-10-26: lint passed, typecheck passed, Vite build passed, a
 
 ### Scope
 
-- `REQUIRED NOW`: complete and verify Home, Memberships, Passes, Personal Training, Trainers, Facilities, About, Contact and legal/policy pages.
-- `REQUIRED NOW`: remove fabricated fallback content from production behavior; define honest empty/error states.
-- `REQUIRED NOW`: complete the admin workflows needed to manage launch content, offers, trainers, media, leads and PT enquiries.
-- `REQUIRED NOW`: fix public routing/content defects, including article section resolution and admin workflow state updates.
-- `DEPENDENCY NOW`: seed/import approved launch content with stable slugs and data-integrity checks.
-- `FUTURE-READY ONLY`: richer member account and commercial fulfillment remain out of scope.
+| Item | Classification | Status |
+| --- | --- | --- |
+| Complete public Home, Memberships, Passes, Personal Training, Trainers, Facilities, About, Contact and legal/policy journeys | REQUIRED NOW | Implemented locally; approved content pending |
+| Remove fabricated fallback records and unverified branch claims | REQUIRED NOW | Implemented locally |
+| Provide honest loading, empty, unavailable and unpublished states | REQUIRED NOW | Implemented locally |
+| Add admin CRUD/publication workflows for trainers, offers, articles and website/legal pages | REQUIRED NOW | Implemented locally; staging UAT pending |
+| Preserve existing lead, PT enquiry, member and media operations | REQUIRED NOW | Preserved; staging UAT pending |
+| Fix article section routing and admin workflow state updates | REQUIRED NOW | Implemented locally |
+| Load approved launch content with stable slugs and data-integrity checks | DEPENDENCY NOW | Blocked on owner-approved source content and remote schema review |
+| Rich member account and commercial fulfillment | FUTURE-READY ONLY | Deferred |
 
 ### Acceptance criteria
 
@@ -82,6 +86,24 @@ Local results on 2026-10-26: lint passed, typecheck passed, Vite build passed, a
 - Anonymous users cannot read lead, booking, member or operational records.
 - No fabricated trainer, price, schedule or article can appear when backend data is missing.
 - Responsive and accessibility smoke tests pass on the agreed browser/device matrix.
+
+### Validation commands
+
+```bash
+npm run check
+npx base44 build
+```
+
+Local results on 2026-10-26: lint, typecheck, Vite production build and Base44 production build passed. Browser/device UAT remains pending because approved content and a confirmed non-production Base44 environment are not yet available.
+
+### Migration and content notes
+
+1. `SitePage` is a new public-read/admin-write entity used for About, Facilities, Privacy and Terms content.
+2. `Article`, `Membership`, `Pass` and `Trainer` now have `is_published`; new admin-created records default to unpublished.
+3. For migration compatibility, existing records without `is_published` remain visible. Inventory them before schema synchronization, explicitly approve each launch record, and set the field during content migration.
+4. Public business contact details now come from the documented `VITE_PUBLIC_*` variables. Unconfigured values and their related controls stay hidden.
+5. About and Facilities deliberately show a pending state until owner-approved facts and branch photography/content are published; stock photography is not presented as the Hurghada branch.
+6. Do not synchronize the new entity or publication fields until the Sprint 1 remote inventory/diff gate is complete.
 
 ## Sprint 3 — Group class schedule
 

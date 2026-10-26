@@ -66,6 +66,10 @@
       "type": "boolean",
       "default": false
     },
+    "is_published": {
+      "type": "boolean",
+      "default": false
+    },
     "published_date": {
       "type": "string",
       "format": "date"

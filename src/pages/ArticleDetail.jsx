@@ -5,55 +5,31 @@ import { useSeo, breadcrumbsLd } from "@/lib/seo";
 import Reveal from "@/components/Reveal";
 import { ArrowRight, Clock, Dumbbell, Target } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import ContentState from "@/components/ContentState";
+import { isPublished, sectionLabel } from "@/lib/content";
 
-const FALLBACK = {
-  "push-day-workout": {
-    title: "The Push Day Blueprint", section: "workouts", category: "Strength", difficulty: "Intermediate", duration_minutes: 60,
-    goal: "Build strength and hypertrophy in chest, shoulders and triceps",
-    equipment: ["Barbell","Dumbbells","Bench","Cables"],
-    target_muscle_groups: ["Chest","Shoulders","Triceps"],
-    author_name: "Ahmed Mohamed",
-    content: "## The Push Day Blueprint\n\nA complete push session targeting chest, shoulders and triceps. Warm up thoroughly, then work through the compounds before isolation work.\n\n### 1. Barbell Bench Press\n- **Sets:** 4 × 6-8\n- **Rest:** 2-3 min\n\n### 2. Overhead Press\n- **Sets:** 3 × 8-10\n- **Rest:** 2 min\n\n### 3. Incline Dumbbell Press\n- **Sets:** 3 × 10-12\n- **Rest:** 90 sec\n\n### 4. Cable Fly\n- **Sets:** 3 × 12-15\n- **Rest:** 60 sec\n\n### 5. Triceps Pushdown\n- **Sets:** 3 × 12-15\n- **Rest:** 60 sec\n\n**Trainer note:** Keep your shoulder blades retracted on pressing movements. If you can't hit the rep range with clean form, drop the weight.",
-  },
-  "nutrition-fat-loss": {
-    title: "Nutrition for Fat Loss: A No-Nonsense Guide", section: "fitness-guides", category: "Nutrition", difficulty: "All Levels",
-    goal: "Lose fat while preserving muscle",
-    equipment: [],
-    target_muscle_groups: [],
-    author_name: "Mona Said",
-    content: "## Nutrition for Fat Loss\n\nFat loss comes down to a sustained calorie deficit. But how you get there matters for keeping muscle and energy.\n\n### 1. Set a moderate deficit\nAim for 300-500 calories below maintenance. Aggressive cuts cost muscle.\n\n### 2. Prioritise protein\n1.6-2.2g per kg of bodyweight. Protein preserves muscle and keeps you full.\n\n### 3. Train while you cut\nKeep resistance training 3-4x per week. Add cardio for extra deficit, not as a replacement.\n\n### 4. Track and adjust\nWeigh yourself 2-3x per week, average the trend. Adjust every 2 weeks, not daily.",
-  },
-  "mobility-drills": {
-    title: "5 Mobility Drills Every Lifter Needs", section: "fitness-tips", category: "Mobility", difficulty: "Beginner",
-    goal: "Improve movement quality and reduce injury risk",
-    equipment: ["Foam Roller","Resistance Band"],
-    target_muscle_groups: ["Hips","Shoulders","Thoracic Spine"],
-    author_name: "Lina Farouk",
-    content: "## 5 Mobility Drills\n\nMove better, lift heavier, stay injury-free. Do these 3-4x per week.\n\n1. **90/90 hip rotations** — 2x10 each side\n2. **Cat-cow** — 2x10\n3. **World's greatest stretch** — 2x5 each side\n4. **Band dislocates** — 2x15\n5. **Thoracic rotations** — 2x10 each side\n\nSpend 5-10 minutes before training. Consistency beats intensity here.",
-  },
-  "welcome-mecca": {
-    title: "Welcome to the Mecca of Fitness", section: "blog", category: "News",
-    content: "## Welcome to Gold's Gym Hurghada\n\nThe Mecca of Fitness has arrived on the Red Sea. Whether you're a resident or a visitor, your strongest version starts here.",
-  },
-};
-
-export default function ArticleDetail() {
-  const { section, slug } = useParams();
+export default function ArticleDetail({ section: sectionProp }) {
+  const { slug } = useParams();
+  const section = sectionProp;
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
+    setFailed(false);
     base44.entities.Article.filter({ section, slug })
-      .then((r) => setArticle(r?.[0] || FALLBACK[slug] || { title: "Article", content: "Coming soon.", section }))
-      .catch(() => setArticle(FALLBACK[slug] || { title: "Article", content: "Coming soon.", section }))
+      .then((records) => setArticle(records.find(isPublished) || null))
+      .catch(() => setFailed(true))
       .finally(() => setLoading(false));
   }, [section, slug]);
 
   const a = article || {};
   useSeo({
-    title: a.title,
+    title: a.title || "Article not found",
     description: a.excerpt || a.title,
     canonical: `https://goldsgymhurghada.com/${section}/${slug}`,
+    noindex: !article,
     jsonLd: [
       breadcrumbsLd([
         { name: "Home", url: "https://goldsgymhurghada.com/" },
@@ -66,12 +42,16 @@ export default function ArticleDetail() {
 
   if (loading) return <div className="pt-32 px-5 text-white/40">Loading…</div>;
 
+  if (!article) {
+    return <div className="min-h-[60vh] px-5 pb-24 pt-36 lg:px-10"><div className="mx-auto max-w-3xl"><ContentState title={failed ? "Article temporarily unavailable" : "Article not found"} message="This article is not published or the link is no longer available." actionTo={`/${section}`} actionLabel={`View ${sectionLabel(section)}`} /></div></div>;
+  }
+
   return (
     <div className="pt-28">
       <div className="px-5 lg:px-10 py-6">
         <div className="max-w-3xl mx-auto text-xs text-white/40 flex gap-2 items-center flex-wrap">
           <Link to="/" className="hover:text-gold">Home</Link> <span>/</span>
-          <Link to={`/${section}`} className="hover:text-gold capitalize">{section.replace("-", " ")}</Link> <span>/</span>
+          <Link to={`/${section}`} className="hover:text-gold capitalize">{sectionLabel(section)}</Link> <span>/</span>
           <span className="text-gold truncate">{a.title}</span>
         </div>
       </div>
@@ -102,7 +82,7 @@ export default function ArticleDetail() {
           </Reveal>
 
           <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-            <Link to={`/${section}`} className="text-gold font-heading hover:gap-3 transition-all flex items-center gap-2">← BACK TO {section.replace("-", " ").toUpperCase()}</Link>
+            <Link to={`/${section}`} className="text-gold font-heading hover:gap-3 transition-all flex items-center gap-2">← BACK TO {sectionLabel(section).toUpperCase()}</Link>
             <Link to="/memberships" className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-6 py-3 clip-tag">JOIN NOW <ArrowRight className="w-4 h-4" /></Link>
           </div>
         </div>

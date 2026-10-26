@@ -23,12 +23,15 @@ export const EVENTS = {
   emailClick: "email_click",
 };
 
-export const WHATSAPP_NUMBER = "201000000000";
-export const PHONE = "+20 65 000 0000";
-export const EMAIL = "hello@goldsgymhurghada.com";
-export const ADDRESS = "Hurghada Marina, Red Sea, Egypt";
+export const WHATSAPP_NUMBER = String(import.meta.env.VITE_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, "");
+export const PHONE = String(import.meta.env.VITE_PUBLIC_PHONE || "").trim();
+export const EMAIL = String(import.meta.env.VITE_PUBLIC_EMAIL || "").trim();
+export const ADDRESS = String(import.meta.env.VITE_PUBLIC_ADDRESS || "").trim();
+export const OPENING_HOURS = String(import.meta.env.VITE_PUBLIC_OPENING_HOURS || "").trim();
+export const HAS_WHATSAPP = Boolean(WHATSAPP_NUMBER);
 
 export function whatsappUrl(message) {
+  if (!HAS_WHATSAPP) return "/contact";
   const text = encodeURIComponent(message || "Hi Gold's Gym Hurghada, I'd like to know more about memberships.");
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
 }

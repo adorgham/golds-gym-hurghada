@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
-import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import LeadForm from "@/components/LeadForm";
 import { Check, ArrowRight, X } from "lucide-react";
+import ContentState from "@/components/ContentState";
+import { publishedOnly } from "@/lib/content";
 
 export default function Memberships() {
   useSeo({
@@ -18,22 +20,17 @@ export default function Memberships() {
   });
 
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    base44.entities.Membership.list("display_order").then(setItems).catch(() => setItems([]));
+    base44.entities.Membership.list("display_order")
+      .then((records) => setItems(publishedOnly(records)))
+      .catch(() => { setItems([]); setFailed(true); })
+      .finally(() => setLoading(false));
   }, []);
 
-  const plans = items.length ? items : [
-    {
-      name: "Monthly Membership", slug: "monthly", price: 1500, currency: "EGP", duration: "1 month",
-      tagline: "Best for residents",
-      description: "Unlimited access to the full Gold's Gym Hurghada facility.",
-      benefits: ["Unlimited gym access", "All group classes included", "Locker & towel service", "Free fitness assessment", "Guest pass once per month"],
-      restrictions: ["Auto-renews monthly", "Cancellation 30 days notice"],
-      recommended_for: "Hurghada residents and regular members",
-      is_featured: true,
-    },
-  ];
+  const plans = items;
 
   return (
     <div className="pt-28">
@@ -45,6 +42,8 @@ export default function Memberships() {
 
       {/* Comparison pillars */}
       <section className="px-5 lg:px-10 pb-20">
+        {loading && <p className="max-w-[1400px] mx-auto py-16 text-center text-white/40">Loading…</p>}
+        {!loading && plans.length === 0 && <div className="max-w-[1400px] mx-auto"><ContentState title={failed ? "Memberships temporarily unavailable" : "Membership options are being updated"} message="Contact the gym for the currently approved membership options and pricing." /></div>}
         <div className="max-w-[1400px] mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {plans.map((m, i) => (
             <Reveal key={m.slug || i} delay={i * 80}>
@@ -77,11 +76,11 @@ export default function Memberships() {
                     className={`block text-center font-heading tracking-wide py-3.5 clip-tag transition-all ${m.is_featured ? "bg-gold text-obsidian hover:brightness-110" : "border border-white/20 text-white hover:border-gold hover:text-gold"}`}>
                     JOIN NOW
                   </Link>
-                  <a href={whatsappUrl(`Hi, I'm interested in the ${m.name}.`)} target="_blank" rel="noreferrer"
+                  {HAS_WHATSAPP && <a href={whatsappUrl(`Hi, I'm interested in the ${m.name}.`)} target="_blank" rel="noreferrer"
                     onClick={() => track(EVENTS.whatsappClick, { location: "membership_card", membership: m.name })}
                     className="flex items-center justify-center gap-1.5 text-sm text-white/55 hover:text-gold py-1.5">
                     <WhatsAppIcon className="w-4 h-4" /> Ask on WhatsApp →
-                  </a>
+                  </a>}
                 </div>
               </div>
             </Reveal>
@@ -90,7 +89,7 @@ export default function Memberships() {
       </section>
 
       {/* Comparison table */}
-      <section className="px-5 lg:px-10 pb-24">
+      {plans.length > 0 && <section className="px-5 lg:px-10 pb-24">
         <div className="max-w-[1400px] mx-auto">
           <h3 className="font-heading text-2xl text-white mb-6">COMPARE PLANS</h3>
           <div className="overflow-x-auto hide-scrollbar">
@@ -128,7 +127,7 @@ export default function Memberships() {
             </table>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* Lead capture */}
       <section className="px-5 lg:px-10 pb-24">

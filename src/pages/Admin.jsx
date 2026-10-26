@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo } from "@/lib/seo";
-import { Users, Calendar, FileText, Image, UserCog, TrendingUp, Mail } from "lucide-react";
+import { Users, Calendar, FileText, Image, UserCog, TrendingUp, Mail, Scale } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import MembersSection from "@/components/admin/MembersSection";
 import MediaLibrary from "@/components/admin/MediaLibrary";
+import ContentManager, { CONTENT_CONFIG } from "@/components/admin/ContentManager";
 
 const TABS = [
   { id: "leads", label: "Leads", icon: Mail },
@@ -16,6 +17,7 @@ const TABS = [
   { id: "media", label: "Media", icon: Image },
   { id: "passes", label: "Passes", icon: Users },
   { id: "articles", label: "Content", icon: FileText },
+  { id: "pages", label: "Pages", icon: Scale },
 ];
 
 const STATUS_COLORS = {
@@ -34,7 +36,7 @@ export default function Admin() {
   const { user } = useAuth();
   const [tab, setTab] = useState("leads");
   const [data, setData] = useState({
-    leads: [], bookings: [], trainers: [], members: [], memberships: [], media: [], passes: [], articles: [],
+    leads: [], bookings: [], trainers: [], members: [], memberships: [], media: [], passes: [], articles: [], pages: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -53,8 +55,9 @@ export default function Admin() {
       base44.entities.MediaAsset.list().catch(() => []),
       base44.entities.Pass.list().catch(() => []),
       base44.entities.Article.list("-created_date").catch(() => []),
-    ]).then(([leads, bookings, trainers, memberships, members, media, passes, articles]) => {
-      setData({ leads, bookings, trainers, memberships, members, media, passes, articles });
+      base44.entities.SitePage.list().catch(() => []),
+    ]).then(([leads, bookings, trainers, memberships, members, media, passes, articles, pages]) => {
+      setData({ leads, bookings, trainers, memberships, members, media, passes, articles, pages });
       setLoading(false);
     });
   }, [user?.role]);
@@ -76,6 +79,7 @@ export default function Admin() {
     media: data.media?.length || 0,
     passes: data.passes?.length || 0,
     articles: data.articles?.length || 0,
+    pages: data.pages?.length || 0,
   };
 
   if (user?.role !== "admin") {
@@ -93,7 +97,7 @@ export default function Admin() {
           <Link to="/" className="text-sm text-gold hover:underline">← Back to site</Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3 mb-8">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex flex-col items-center gap-1 p-4 border transition-all ${tab === t.id ? "border-gold bg-gold/10" : "border-white/10 hover:border-gold/50"}`}>
@@ -148,69 +152,19 @@ export default function Admin() {
               </Table>
             )}
 
-            {tab === "trainers" && (
-              <Table headers={["Name","Title","Experience","Specializations","Slug"]}>
-                {(data.trainers || []).map((t) => (
-                  <tr key={t.id} className="border-t border-white/5 text-sm">
-                    <td className="p-3 text-white">{t.name}</td>
-                    <td className="p-3 text-white/60">{t.title}</td>
-                    <td className="p-3 text-white/60">{t.years_experience}+ yrs</td>
-                    <td className="p-3 text-white/60 text-xs">{(t.specializations || []).join(", ")}</td>
-                    <td className="p-3 text-white/40 text-xs"><Link to={`/trainers/${t.slug}`} className="text-gold hover:underline">/{t.slug}</Link></td>
-                  </tr>
-                ))}
-                {(data.trainers || []).length === 0 && <tr><td className="p-8 text-white/30 text-center">No trainers yet. Add trainers via the database to populate the directory.</td></tr>}
-              </Table>
-            )}
+            {tab === "trainers" && <ContentManager {...CONTENT_CONFIG.trainers} items={data.trainers} onChange={(items) => setData((current) => ({ ...current, trainers: items }))} />}
 
             {tab === "members" && <MembersSection memberships={data.memberships || []} />}
 
-            {tab === "memberships" && (
-              <Table headers={["Name","Price","Duration","Recommended","Featured"]}>
-                {(data.memberships || []).map((m) => (
-                  <tr key={m.id} className="border-t border-white/5 text-sm">
-                    <td className="p-3 text-white">{m.name}</td>
-                    <td className="p-3 text-gold font-heading">{m.price} {m.currency}</td>
-                    <td className="p-3 text-white/60">{m.duration}</td>
-                    <td className="p-3 text-white/60 text-xs">{m.recommended_for}</td>
-                    <td className="p-3 text-white/60 text-xs">{m.is_featured ? "★" : "—"}</td>
-                  </tr>
-                ))}
-                {(data.memberships || []).length === 0 && <tr><td className="p-8 text-white/30 text-center">No memberships configured.</td></tr>}
-              </Table>
-            )}
+            {tab === "memberships" && <ContentManager {...CONTENT_CONFIG.memberships} items={data.memberships} onChange={(items) => setData((current) => ({ ...current, memberships: items }))} />}
 
             {tab === "media" && <MediaLibrary />}
 
-            {tab === "passes" && (
-              <Table headers={["Name","Price","Days","Recommended","Slug"]}>
-                {(data.passes || []).map((p) => (
-                  <tr key={p.id} className="border-t border-white/5 text-sm">
-                    <td className="p-3 text-white">{p.name}</td>
-                    <td className="p-3 text-gold font-heading">{p.price} {p.currency}</td>
-                    <td className="p-3 text-white/60">{p.days}</td>
-                    <td className="p-3 text-white/60 text-xs">{p.recommended_for}</td>
-                    <td className="p-3 text-white/40 text-xs"><Link to={`/passes/${p.slug}`} className="text-gold hover:underline">/{p.slug}</Link></td>
-                  </tr>
-                ))}
-                {(data.passes || []).length === 0 && <tr><td className="p-8 text-white/30 text-center">No passes configured.</td></tr>}
-              </Table>
-            )}
+            {tab === "passes" && <ContentManager {...CONTENT_CONFIG.passes} items={data.passes} onChange={(items) => setData((current) => ({ ...current, passes: items }))} />}
 
-            {tab === "articles" && (
-              <Table headers={["Title","Section","Category","Author","Slug"]}>
-                {(data.articles || []).map((a) => (
-                  <tr key={a.id} className="border-t border-white/5 text-sm">
-                    <td className="p-3 text-white">{a.title}</td>
-                    <td className="p-3 text-white/60 capitalize">{a.section.replace("-", " ")}</td>
-                    <td className="p-3 text-white/60 text-xs">{a.category}</td>
-                    <td className="p-3 text-white/60 text-xs">{a.author_name || "—"}</td>
-                    <td className="p-3 text-white/40 text-xs"><Link to={`/${a.section}/${a.slug}`} className="text-gold hover:underline">/{a.section}/{a.slug}</Link></td>
-                  </tr>
-                ))}
-                {(data.articles || []).length === 0 && <tr><td className="p-8 text-white/30 text-center">No content yet.</td></tr>}
-              </Table>
-            )}
+            {tab === "articles" && <ContentManager {...CONTENT_CONFIG.articles} items={data.articles} onChange={(items) => setData((current) => ({ ...current, articles: items }))} />}
+
+            {tab === "pages" && <ContentManager {...CONTENT_CONFIG.pages} items={data.pages} onChange={(items) => setData((current) => ({ ...current, pages: items }))} />}
           </div>
         )}
       </div>

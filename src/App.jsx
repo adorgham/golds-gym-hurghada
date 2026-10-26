@@ -27,6 +27,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import LegalPage from '@/pages/LegalPage';
 import { captureAttribution } from '@/lib/attribution';
 // Add page imports here
 
@@ -73,13 +74,15 @@ const AuthenticatedApp = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/blog" element={<ArticleList section="blog" />} />
-        <Route path="/blog/:slug" element={<ArticleDetail />} />
+        <Route path="/blog/:slug" element={<ArticleDetail section="blog" />} />
         <Route path="/fitness-guides" element={<ArticleList section="fitness-guides" />} />
-        <Route path="/fitness-guides/:slug" element={<ArticleDetail />} />
+        <Route path="/fitness-guides/:slug" element={<ArticleDetail section="fitness-guides" />} />
         <Route path="/workouts" element={<ArticleList section="workouts" />} />
-        <Route path="/workouts/:slug" element={<ArticleDetail />} />
+        <Route path="/workouts/:slug" element={<ArticleDetail section="workouts" />} />
         <Route path="/fitness-tips" element={<ArticleList section="fitness-tips" />} />
-        <Route path="/fitness-tips/:slug" element={<ArticleDetail />} />
+        <Route path="/fitness-tips/:slug" element={<ArticleDetail section="fitness-tips" />} />
+        <Route path="/privacy" element={<LegalPage slug="privacy" />} />
+        <Route path="/terms" element={<LegalPage slug="terms" />} />
       </Route>
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/admin" element={<Admin />} />

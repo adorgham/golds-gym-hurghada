@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, organizationLd } from "@/lib/seo";
-import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
-import AnimatedCounter from "@/components/AnimatedCounter";
 import SectionHeading from "@/components/SectionHeading";
 import { ArrowRight, Dumbbell, Flame, Users, Activity, Heart, Zap } from "lucide-react";
+import ContentState from "@/components/ContentState";
+import { publishedOnly } from "@/lib/content";
 
 const HERO_IMG = "https://images.unsplash.com/photo-1534438327276-1ff8e2a4f5a3?auto=format&fit=crop&w=2000&q=80";
 const EXPERIENCE_IMG = "https://images.unsplash.com/photo-1571902943202-507ec2610f02?auto=format&fit=crop&w=1600&q=80";
@@ -43,11 +44,11 @@ export default function Home() {
     base44.entities.ClassSession.list().catch(() => []),
     base44.entities.Article.filter({ is_featured: true }).catch(() => base44.entities.Article.list("-published_date", 4).catch(() => []))]
     ).then(([m, p, t, s, a]) => {
-      setMemberships(m || []);
-      setPasses(p || []);
-      setTrainers(t || []);
+      setMemberships(publishedOnly(m));
+      setPasses(publishedOnly(p));
+      setTrainers(publishedOnly(t));
       setSessions(s || []);
-      setArticles(a || []);
+      setArticles(publishedOnly(a));
     });
   }, []);
 
@@ -61,7 +62,7 @@ export default function Home() {
       {/* HERO */}
       <section className="relative min-h-[100svh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={HERO_IMG} alt="Athlete training at Gold's Gym Hurghada" className="w-full h-full object-cover" />
+          <img src={HERO_IMG} alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-obsidian via-obsidian/80 to-obsidian/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-obsidian/60" />
         </div>
@@ -96,7 +97,7 @@ export default function Home() {
               <Link to="/memberships" className="inline-flex items-center border border-white/25 text-white font-heading tracking-wide px-8 py-4 hover:border-gold hover:text-gold transition-all">
                 EXPLORE MEMBERSHIPS
               </Link>
-              <Link to="/passes/day-pass" onClick={() => track(EVENTS.passView, { pass: "day-pass", location: "hero" })}
+              <Link to="/passes" onClick={() => track(EVENTS.passView, { location: "hero" })}
               className="inline-flex items-center text-white/70 font-semibold hover:text-gold transition-colors px-2">
                 Get a Day Pass →
               </Link>
@@ -117,15 +118,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {quickOptions.length === 0 ?
-              <>
-                  {[["Monthly", "/memberships"], ["Day Pass", "/passes/day-pass"], ["3-Day", "/passes/3-day-pass"], ["5-Day", "/passes/5-day-pass"], ["7-Day", "/passes/7-day-pass"]].map(([l, to]) =>
-                <Link key={l} to={to} className="group border border-white/10 p-4 hover:border-gold hover:bg-gold/5 transition-all">
-                      <div className="text-[10px] tracking-[0.2em] text-gold font-semibold uppercase mb-1">{to.includes("memberships") ? "Resident" : "Visitor"}</div>
-                      <div className="font-heading text-lg text-white group-hover:text-gold">{l}</div>
-                      <div className="text-xs text-white/40 mt-1">Tap to view →</div>
-                    </Link>
-                )}
-                </> :
+              <div className="col-span-full"><ContentState compact title="Access options are being updated" message="Contact the gym for currently approved memberships and visitor passes." /></div> :
               quickOptions.map((o) =>
               <Link key={o.to + o.label} to={o.to}
               onClick={() => track(o.kind === "membership" ? EVENTS.membershipView : EVENTS.passView, { location: "quick_selector", item: o.label })}
@@ -148,23 +141,10 @@ export default function Home() {
               eyebrow="The Experience"
               title="AN ARCHITECTURE OF"
               accent="STRENGTH"
-              subtitle="Step into a training environment engineered for results. Every zone, every plate, every meter is built to push you past your limits." />
+              subtitle="Explore the branch information and approved training facilities available in Hurghada." />
             
             <div className="mt-10 grid grid-cols-3 gap-6">
-              {[
-              { v: 2000, s: "+", l: "m² Training Floor" },
-              { v: 80, s: "+", l: "Machines" },
-              { v: 24, s: "/7", l: "Open Daily" }].
-              map((stat) =>
-              <Reveal key={stat.l}>
-                  <div className="border-l-2 border-gold pl-4">
-                    <div className="font-heading text-4xl lg:text-5xl text-white">
-                      <AnimatedCounter value={stat.v} suffix={stat.s} />
-                    </div>
-                    <div className="text-xs text-white/50 mt-1 uppercase tracking-wide">{stat.l}</div>
-                  </div>
-                </Reveal>
-              )}
+              {["Strength", "Cardio", "Functional"].map((area) => <Reveal key={area}><div className="border-l-2 border-gold pl-4"><div className="font-heading text-xl text-white">{area}</div><div className="text-xs text-white/50 mt-1 uppercase tracking-wide">Training areas</div></div></Reveal>)}
             </div>
             <Reveal delay={200}>
               <Link to="/facilities" className="mt-10 inline-flex items-center gap-2 text-gold font-heading tracking-wide hover:gap-3 transition-all">
@@ -174,12 +154,8 @@ export default function Home() {
           </div>
           <Reveal delay={150}>
             <div className="relative aspect-[4/5] overflow-hidden">
-              <img src={EXPERIENCE_IMG} alt="Gold's Gym Hurghada training floor" className="w-full h-full object-cover" />
+              <img src={EXPERIENCE_IMG} alt="" className="w-full h-full object-cover" />
               <div className="absolute inset-0 ring-1 ring-gold/20" />
-              <div className="absolute bottom-4 left-4 glass px-4 py-3 border-l-2 border-gold">
-                <div className="text-[10px] tracking-[0.2em] text-gold font-semibold uppercase">Free Weights Zone</div>
-                <div className="font-heading text-white text-sm">Dumbbells up to 60kg</div>
-              </div>
             </div>
           </Reveal>
         </div>
@@ -213,11 +189,8 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {(sessions.length ? sessions.slice(0, 4) : [
-            { class_name: "BODY PUMP", day_of_week: "Tuesday", start_time: "18:00", trainer_name: "Coach", difficulty: "Intermediate" },
-            { class_name: "SPINNING", day_of_week: "Wednesday", start_time: "07:00", trainer_name: "Coach", difficulty: "All Levels" },
-            { class_name: "YOGA FLOW", day_of_week: "Thursday", start_time: "19:30", trainer_name: "Coach", difficulty: "Beginner" },
-            { class_name: "FUNCTIONAL HIIT", day_of_week: "Friday", start_time: "10:00", trainer_name: "Coach", difficulty: "Advanced" }]).
+            {sessions.length === 0 && <div className="col-span-full"><ContentState compact title="Class timetable is being updated" message="View the schedule page or contact the gym for confirmed times." actionTo="/classes/schedule" actionLabel="View schedule" /></div>}
+            {sessions.slice(0, 4).
             map((s, i) =>
             <Reveal key={i} delay={i * 70}>
                 <Link to="/classes/schedule" onClick={() => track(EVENTS.classView, { class: s.class_name, location: "home_preview" })}
@@ -236,17 +209,14 @@ export default function Home() {
       <section className="py-24 px-5 lg:px-10 bg-white/[0.02] border-y border-white/5">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-12">
-            <SectionHeading eyebrow="The Titans" title="MEET THE" accent="TRAINERS" subtitle="Elite coaches. Proven results. Your transformation starts with the right mentor." />
+            <SectionHeading eyebrow="The Team" title="MEET THE" accent="TRAINERS" subtitle="Review approved trainer profiles and find a coach aligned with your goals." />
             <Link to="/trainers" className="inline-flex items-center gap-2 text-gold font-heading tracking-wide hover:gap-3 transition-all">
               MEET OUR TRAINERS <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {(trainers.length ? trainers.slice(0, 4) : [
-            { name: "Ahmed Mohamed", title: "Head Strength Coach", slug: "ahmed-mohamed", specializations: ["Strength", "Bodybuilding"] },
-            { name: "Sara Hassan", title: "Women's Fitness Specialist", slug: "sara-hassan", specializations: ["Weight Loss", "Women's Fitness"] },
-            { name: "Omar Khalil", title: "Functional Training Coach", slug: "omar-khalil", specializations: ["Functional", "Mobility"] },
-            { name: "Lina Farouk", title: "Yoga & Mobility Coach", slug: "lina-farouk", specializations: ["Mobility", "Recovery"] }]).
+            {trainers.length === 0 && <div className="col-span-full"><ContentState compact title="Trainer profiles are being prepared" message="Contact the gym for help choosing a coach." /></div>}
+            {trainers.slice(0, 4).
             map((t, i) =>
             <Reveal key={t.slug || i} delay={i * 70}>
                 <Link to={t.slug ? `/trainers/${t.slug}` : "/trainers"}
@@ -295,10 +265,8 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {(articles.length ? articles.slice(0, 3) : [
-            { title: "The Push Day Blueprint", slug: "push-day-workout", section: "workouts", excerpt: "A complete push workout for strength and hypertrophy.", category: "Strength" },
-            { title: "Nutrition for Fat Loss: A No-Nonsense Guide", slug: "nutrition-fat-loss", section: "fitness-guides", excerpt: "How to structure your diet to shed fat without losing muscle.", category: "Nutrition" },
-            { title: "5 Mobility Drills Every Lifter Needs", slug: "mobility-drills", section: "fitness-tips", excerpt: "Move better, lift heavier, stay injury-free.", category: "Mobility" }]).
+            {articles.length === 0 && <div className="col-span-full"><ContentState compact title="New fitness content is coming soon" message="Approved articles will appear here once published." actionTo="/blog" actionLabel="Visit the blog" /></div>}
+            {articles.slice(0, 3).
             map((a, i) => {
               const to = `/${a.section}/${a.slug}`;
               return (
@@ -319,7 +287,7 @@ export default function Home() {
       </section>
 
       {/* WHATSAPP STRIP */}
-      <section className="px-5 lg:px-10 pb-24">
+      {HAS_WHATSAPP && <section className="px-5 lg:px-10 pb-24">
         <Reveal className="max-w-[1400px] mx-auto">
           <a href={whatsappUrl("Hi Gold's Gym Hurghada, I'd like to know more.")} target="_blank" rel="noreferrer"
           onClick={() => track(EVENTS.whatsappClick, { location: "home_strip" })}
@@ -328,7 +296,7 @@ export default function Home() {
             <span className="font-heading text-sm tracking-wide flex items-center gap-2 text-[hsl(var(--background))]">CHAT NOW <ArrowRight className="w-5 h-5" /></span>
           </a>
         </Reveal>
-      </section>
+      </section>}
     </div>);
 
 }

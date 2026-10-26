@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
-import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import { ArrowRight, Target, Users, TrendingUp, Heart } from "lucide-react";
+import ContentState from "@/components/ContentState";
+import { publishedOnly } from "@/lib/content";
 
 const GOALS = [
   { icon: TrendingUp, title: "Build Strength", desc: "Progressive overload programming to move heavier iron, safely." },
@@ -24,8 +26,8 @@ export default function PersonalTraining() {
   });
 
   const [trainers, setTrainers] = useState([]);
-  useEffect(() => { base44.entities.Trainer.list("display_order").then(setTrainers).catch(() => setTrainers([])); }, []);
-  const list = trainers.length ? trainers : [{ name: "Ahmed Mohamed", title: "Head Strength Coach", slug: "ahmed-mohamed" }, { name: "Sara Hassan", title: "Women's Fitness Specialist", slug: "sara-hassan" }, { name: "Omar Khalil", title: "Functional Training Coach", slug: "omar-khalil" }, { name: "Lina Farouk", title: "Yoga & Mobility Coach", slug: "lina-farouk" }];
+  useEffect(() => { base44.entities.Trainer.list("display_order").then((records) => setTrainers(publishedOnly(records))).catch(() => setTrainers([])); }, []);
+  const list = trainers;
 
   return (
     <div className="pt-28">
@@ -37,9 +39,9 @@ export default function PersonalTraining() {
             <Link to="/trainers" onClick={() => track(EVENTS.trainerView, { location: "pt_hero" })} className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-8 py-4 hover:brightness-110 transition-all clip-tag">
               BROWSE TRAINERS <ArrowRight className="w-4 h-4" />
             </Link>
-            <a href={whatsappUrl("Hi, I'd like to know about personal training.")} target="_blank" rel="noreferrer" onClick={() => track(EVENTS.whatsappClick, { location: "pt_hero" })} className="inline-flex items-center border border-white/20 text-white font-heading tracking-wide px-8 py-4 hover:border-gold hover:text-gold transition-all">
+            {HAS_WHATSAPP && <a href={whatsappUrl("Hi, I'd like to know about personal training.")} target="_blank" rel="noreferrer" onClick={() => track(EVENTS.whatsappClick, { location: "pt_hero" })} className="inline-flex items-center border border-white/20 text-white font-heading tracking-wide px-8 py-4 hover:border-gold hover:text-gold transition-all">
               <WhatsAppIcon className="w-4 h-4" /> TALK ON WHATSAPP
-            </a>
+            </a>}
           </div>
         </div>
       </section>
@@ -62,6 +64,7 @@ export default function PersonalTraining() {
         <div className="max-w-[1400px] mx-auto">
           <SectionHeading eyebrow="Pick Your Coach" title="CHOOSE A" accent="TRAINER" />
           <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {list.length === 0 && <div className="col-span-full"><ContentState title="Trainer profiles are being prepared" message="Send an enquiry and our team will help match you with an available coach." /></div>}
             {list.map((t, i) => (
               <Reveal key={t.slug || i} delay={i * 70}>
                 <Link to={t.slug ? `/trainers/${t.slug}` : "/trainers"} onClick={() => track(EVENTS.trainerView, { trainer: t.name, location: "pt_page" })}

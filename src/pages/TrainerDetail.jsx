@@ -3,10 +3,12 @@ import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { getAttribution } from "@/lib/attribution";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
-import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import Reveal from "@/components/Reveal";
 import { ArrowRight, Check, Award, Globe, Clock, Instagram, Loader2, Calendar } from "lucide-react";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
+import ContentState from "@/components/ContentState";
+import { isPublished } from "@/lib/content";
 
 function safeUrl(url) {
   if (!url || typeof url !== "string") return null;
@@ -18,15 +20,11 @@ function safeUrl(url) {
   }
 }
 
-const FALLBACK = {
-  "ahmed-mohamed": { name: "Ahmed Mohamed", title: "Head Strength Coach", years_experience: 12, certifications: ["NSCA-CSCS","Precision Nutrition L1"], languages: ["Arabic","English"], specializations: ["Strength","Bodybuilding","Sports Performance"], expertise_areas: ["Powerlifting","Hypertrophy","Athletic Performance"], client_focus: ["Athletes","Advanced Lifters"], philosophy: "Strength is a skill. Master the basics, load progressively, and the body follows.", bio: "Ahmed has coached national-level powerlifters and bodybuilders for over a decade. His approach blends old-school iron with modern sports science.", availability: "Mon–Sat, mornings & evenings", instagram_url: "#" },
-  "sara-hassan": { name: "Sara Hassan", title: "Women's Fitness Specialist", years_experience: 8, certifications: ["ACE Personal Trainer","Pre/Post-Natal Specialist"], languages: ["Arabic","English","French"], specializations: ["Women's Fitness","Weight Loss","Beginner Training"], expertise_areas: ["Fat Loss","Toning","Beginner Programming"], client_focus: ["Women","Beginners"], philosophy: "Sustainable results come from consistency, not extremes. We build habits that last.", bio: "Sara specializes in helping women build confidence and strength in a supportive environment. Her programs are designed for real life and long-term results.", availability: "Sun–Fri, flexible", instagram_url: "#" },
-};
-
 export default function TrainerDetail() {
   const { slug } = useParams();
   const [trainer, setTrainer] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
   const [booking, setBooking] = useState({ preferred_date: "", preferred_time: "", training_goal: "", is_member: false, name: "", phone: "", whatsapp: "", email: "" });
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -35,9 +33,11 @@ export default function TrainerDetail() {
   const formStartedAt = useRef(Date.now());
 
   useEffect(() => {
+    setLoading(true);
+    setFailed(false);
     base44.entities.Trainer.filter({ slug })
-      .then((r) => setTrainer(r?.[0] || FALLBACK[slug] || FALLBACK["ahmed-mohamed"]))
-      .catch(() => setTrainer(FALLBACK[slug] || FALLBACK["ahmed-mohamed"]))
+      .then((records) => setTrainer(records.find(isPublished) || null))
+      .catch(() => setFailed(true))
       .finally(() => setLoading(false));
     track(EVENTS.trainerView, { trainer: slug, location: "trainer_detail" });
     track(EVENTS.trainerBookingStart, { trainer: slug });
@@ -48,6 +48,7 @@ export default function TrainerDetail() {
     title: t.name ? `${t.name} — Personal Trainer` : "Personal Trainer",
     description: t.bio || `Book a personal training session with ${t.name} at Gold's Gym Hurghada.`,
     canonical: `https://goldsgymhurghada.com/trainers/${slug}`,
+    noindex: !trainer,
     jsonLd: [
       breadcrumbsLd([
         { name: "Home", url: "https://goldsgymhurghada.com/" },
@@ -75,7 +76,7 @@ export default function TrainerDetail() {
       track(EVENTS.trainerBookingSubmit, { trainer: t.name, source: "trainer_detail" });
       setDone(true);
     } catch (err) {
-      setSubmissionError(err.response?.data?.error || "Could not submit. Please try WhatsApp.");
+      setSubmissionError(err.response?.data?.error || "Could not submit. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -84,6 +85,7 @@ export default function TrainerDetail() {
   const field = "w-full bg-white/[0.03] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-gold focus:outline-none transition-colors";
 
   if (loading) return <div className="pt-32 px-5 text-white/40">Loading…</div>;
+  if (!trainer) return <div className="min-h-[60vh] px-5 pb-24 pt-36 lg:px-10"><div className="mx-auto max-w-3xl"><ContentState title={failed ? "Trainer profile temporarily unavailable" : "Trainer not found"} message="This trainer profile is not currently published. Contact the gym for help choosing a coach." actionTo="/trainers" actionLabel="View trainers" /></div></div>;
 
   return (
     <div className="pt-28">
@@ -117,11 +119,11 @@ export default function TrainerDetail() {
               <a href="#book" className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-7 py-4 hover:brightness-110 transition-all clip-tag">
                 BOOK PERSONAL TRAINING <ArrowRight className="w-4 h-4" />
               </a>
-              <a href={whatsappUrl(`Hi, I'd like to ask about training with ${t.name}.`)} target="_blank" rel="noreferrer"
+              {HAS_WHATSAPP && <a href={whatsappUrl(`Hi, I'd like to ask about training with ${t.name}.`)} target="_blank" rel="noreferrer"
                 onClick={() => track(EVENTS.whatsappClick, { location: "trainer_hero", trainer: t.name })}
                 className="inline-flex items-center gap-2 border border-white/20 text-white font-heading tracking-wide px-7 py-4 hover:border-gold hover:text-gold transition-all">
                 <WhatsAppIcon className="w-4 h-4" /> ASK ABOUT THIS TRAINER
-              </a>
+              </a>}
             </div>
           </Reveal>
         </div>
@@ -196,7 +198,7 @@ export default function TrainerDetail() {
                   <div className="w-14 h-14 rounded-full bg-gold/15 flex items-center justify-center mx-auto mb-4"><Check className="w-7 h-7 text-gold" /></div>
                   <h3 className="font-heading text-2xl text-white mb-2">Booking Request Sent</h3>
                   <p className="text-white/55 text-sm mb-5">{t.name} will contact you to confirm your session.</p>
-                  <a href={whatsappUrl(`Hi, I just booked a session with ${t.name}.`)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading px-6 py-3 clip-tag"><WhatsAppIcon className="w-4 h-4" /> Open WhatsApp</a>
+                  {HAS_WHATSAPP && <a href={whatsappUrl(`Hi, I just requested a session with ${t.name}.`)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading px-6 py-3 clip-tag"><WhatsAppIcon className="w-4 h-4" /> Open WhatsApp</a>}
                 </div>
               ) : (
                 <>

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { ADDRESS, PHONE } from "@/lib/site";
 
 const SITE_NAME = "Gold's Gym Hurghada";
 const DEFAULT_OG_IMAGE = "https://images.unsplash.com/photo-1534438327276-1ff8e2a4f5a3?auto=format&fit=crop&w=1200&q=80";
@@ -74,18 +75,8 @@ export const organizationLd = {
   name: "Gold's Gym Hurghada",
   description: "The Mecca of Fitness on the Red Sea. Memberships, day passes, group classes and elite personal training.",
   url: "https://goldsgymhurghada.com",
-  telephone: "+20-65-000-0000",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Hurghada Marina, Red Sea",
-    addressLocality: "Hurghada",
-    addressCountry: "EG",
-  },
-  openingHoursSpecification: [{
-    "@type": "OpeningHoursSpecification",
-    dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-    opens: "06:00", closes: "23:59",
-  }],
+  ...(PHONE ? { telephone: PHONE } : {}),
+  ...(ADDRESS ? { address: ADDRESS } : {}),
 };
 
 export const breadcrumbsLd = (items) => ({

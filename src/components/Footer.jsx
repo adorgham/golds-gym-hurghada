@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube } from "lucide-react";
-import { PHONE, EMAIL, ADDRESS, whatsappUrl, track, EVENTS } from "@/lib/site";
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { PHONE, EMAIL, ADDRESS, OPENING_HOURS, HAS_WHATSAPP, whatsappUrl, track, EVENTS } from "@/lib/site";
 import GoldsLogo from "@/components/GoldsLogo";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 
@@ -28,13 +28,6 @@ export default function Footer() {
           <p className="text-white/55 text-sm leading-relaxed max-w-sm mb-6">
             The Mecca of Fitness on the Red Sea. Where champions are forged and ordinary becomes legendary. Train where fitness history lives.
           </p>
-          <div className="flex gap-3">
-            {[Instagram, Facebook, Youtube].map((Icon, i) => (
-              <a key={i} href="#" className="w-10 h-10 border border-white/15 flex items-center justify-center text-white/60 hover:text-gold hover:border-gold transition-colors" aria-label="Social">
-                <Icon className="w-4 h-4" />
-              </a>
-            ))}
-          </div>
         </div>
 
         <div>
@@ -64,23 +57,24 @@ export default function Footer() {
         <div>
           <h4 className="font-heading text-gold text-sm tracking-[0.1em] mb-4 uppercase">Contact</h4>
           <ul className="space-y-3 text-sm text-white/55">
-            <li className="flex gap-2.5"><MapPin className="w-4 h-4 text-gold mt-0.5 shrink-0" /> {ADDRESS}</li>
-            <li className="flex gap-2.5"><Clock className="w-4 h-4 text-gold mt-0.5 shrink-0" /> Daily 06:00 – 24:00</li>
-            <li>
+            {ADDRESS && <li className="flex gap-2.5"><MapPin className="w-4 h-4 text-gold mt-0.5 shrink-0" /> {ADDRESS}</li>}
+            {OPENING_HOURS && <li className="flex gap-2.5"><Clock className="w-4 h-4 text-gold mt-0.5 shrink-0" /> {OPENING_HOURS}</li>}
+            {PHONE && <li>
               <a href={`tel:${PHONE}`} onClick={() => track(EVENTS.phoneClick, { location: "footer" })} className="flex gap-2.5 hover:text-white">
                 <Phone className="w-4 h-4 text-gold mt-0.5 shrink-0" /> {PHONE}
               </a>
-            </li>
-            <li>
+            </li>}
+            {EMAIL && <li>
               <a href={`mailto:${EMAIL}`} onClick={() => track(EVENTS.emailClick, { location: "footer" })} className="flex gap-2.5 hover:text-white">
                 <Mail className="w-4 h-4 text-gold mt-0.5 shrink-0" /> {EMAIL}
               </a>
-            </li>
-            <li>
+            </li>}
+            {HAS_WHATSAPP && <li>
               <a href={whatsappUrl()} target="_blank" rel="noreferrer" onClick={() => track(EVENTS.whatsappClick, { location: "footer" })} className="inline-flex items-center gap-2 mt-1 text-gold font-semibold">
                 <WhatsAppIcon className="w-4 h-4" /> WhatsApp Us →
               </a>
-            </li>
+            </li>}
+            {!ADDRESS && !OPENING_HOURS && !PHONE && !EMAIL && !HAS_WHATSAPP && <li><Link to="/contact" className="text-gold hover:text-white">Send an enquiry →</Link></li>}
           </ul>
         </div>
       </div>
@@ -89,8 +83,8 @@ export default function Footer() {
         <div className="max-w-[1400px] mx-auto px-5 lg:px-10 flex flex-col sm:flex-row gap-3 justify-between text-xs text-white/35">
           <p>© {new Date().getFullYear()} Gold's Gym Hurghada. All rights reserved.</p>
           <div className="flex gap-5">
-            <Link to="/contact" className="hover:text-white/70">Privacy Policy</Link>
-            <Link to="/contact" className="hover:text-white/70">Terms</Link>
+            <Link to="/privacy" className="hover:text-white/70">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white/70">Terms</Link>
             <Link to="/contact" className="hover:text-white/70">Contact</Link>
           </div>
         </div>

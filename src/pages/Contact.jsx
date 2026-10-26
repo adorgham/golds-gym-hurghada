@@ -1,5 +1,5 @@
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
-import { track, EVENTS, PHONE, EMAIL, ADDRESS, whatsappUrl } from "@/lib/site";
+import { track, EVENTS, PHONE, EMAIL, ADDRESS, OPENING_HOURS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import LeadForm from "@/components/LeadForm";
@@ -13,6 +13,11 @@ export default function Contact() {
     canonical: "https://goldsgymhurghada.com/contact",
     jsonLd: breadcrumbsLd([{ name: "Home", url: "https://goldsgymhurghada.com/" }, { name: "Contact", url: "https://goldsgymhurghada.com/contact" }]),
   });
+  const contactMethods = [
+    PHONE && { icon: Phone, label: "Call Us", value: PHONE, href: `tel:${PHONE}`, event: EVENTS.phoneClick },
+    HAS_WHATSAPP && { icon: WhatsAppIcon, label: "WhatsApp", value: "Chat now", href: whatsappUrl(), event: EVENTS.whatsappClick, ext: true },
+    EMAIL && { icon: Mail, label: "Email", value: EMAIL, href: `mailto:${EMAIL}`, event: EVENTS.emailClick },
+  ].filter(Boolean);
 
   return (
     <div className="pt-28">
@@ -24,11 +29,7 @@ export default function Contact() {
 
       <section className="px-5 lg:px-10 py-8">
         <div className="max-w-[1400px] mx-auto grid lg:grid-cols-3 gap-4">
-          {[
-            { icon: Phone, label: "Call Us", value: PHONE, href: `tel:${PHONE}`, event: EVENTS.phoneClick },
-            { icon: WhatsAppIcon, label: "WhatsApp", value: "Chat now", href: whatsappUrl(), event: EVENTS.whatsappClick, ext: true },
-            { icon: Mail, label: "Email", value: EMAIL, href: `mailto:${EMAIL}`, event: EVENTS.emailClick },
-          ].map((c) => (
+          {contactMethods.map((c) => (
             <Reveal key={c.label}>
               <a href={c.href} target={c.ext ? "_blank" : undefined} rel={c.ext ? "noreferrer" : undefined}
                 onClick={() => track(c.event, { location: "contact_page" })}
@@ -49,9 +50,10 @@ export default function Contact() {
           <div>
             <h3 className="font-heading text-3xl text-white mb-6">VISIT US</h3>
             <div className="space-y-4 text-white/60">
-              <div className="flex gap-3"><MapPin className="w-5 h-5 text-gold shrink-0" /> {ADDRESS}</div>
-              <div className="flex gap-3"><Clock className="w-5 h-5 text-gold shrink-0" /> Open daily 06:00 – 24:00</div>
-              <div className="flex gap-3"><Phone className="w-5 h-5 text-gold shrink-0" /> {PHONE}</div>
+              {ADDRESS && <div className="flex gap-3"><MapPin className="w-5 h-5 text-gold shrink-0" /> {ADDRESS}</div>}
+              {OPENING_HOURS && <div className="flex gap-3"><Clock className="w-5 h-5 text-gold shrink-0" /> {OPENING_HOURS}</div>}
+              {PHONE && <div className="flex gap-3"><Phone className="w-5 h-5 text-gold shrink-0" /> {PHONE}</div>}
+              {!ADDRESS && !OPENING_HOURS && !PHONE && <p>Approved visit details are being prepared. Send the form and our team will reply with directions and opening hours.</p>}
             </div>
             <div className="mt-8 aspect-[16/10] bg-white/5 border border-white/10 flex items-center justify-center text-white/30">
               <MapPin className="w-8 h-8" />
@@ -59,10 +61,10 @@ export default function Contact() {
           </div>
           <div className="border border-white/10 bg-white/[0.02] p-7">
             <LeadForm leadType="contact" sourcePage="/contact" title="Send a Message" ctaLabel="SEND MESSAGE" />
-            <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
+            {HAS_WHATSAPP && <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
               <LinkLike href={whatsappUrl("Hi, I'd like to book a gym tour.")} ext label="Request a Gym Tour" />
               <LinkLike href={whatsappUrl("Hi, please call me back about Gold's Gym.")} ext label="Request a Callback" />
-            </div>
+            </div>}
           </div>
         </div>
       </section>

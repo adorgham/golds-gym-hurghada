@@ -6,17 +6,8 @@ import { track, EVENTS } from "@/lib/site";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import { Search } from "lucide-react";
-
-const ALL_SPECS = ["Bodybuilding","Strength","Weight Loss","Functional Training","Mobility","Rehabilitation","Women's Fitness","Sports Performance","Beginner Training","Nutrition Coaching"];
-
-const FALLBACK = [
-  { name: "Ahmed Mohamed", slug: "ahmed-mohamed", title: "Head Strength Coach", years_experience: 12, specializations: ["Strength","Bodybuilding","Sports Performance"], languages: ["Arabic","English"], client_focus: ["Athletes","Advanced"] },
-  { name: "Sara Hassan", slug: "sara-hassan", title: "Women's Fitness Specialist", years_experience: 8, specializations: ["Women's Fitness","Weight Loss","Beginner Training"], languages: ["Arabic","English","French"], client_focus: ["Women","Beginners"] },
-  { name: "Omar Khalil", slug: "omar-khalil", title: "Functional Training Coach", years_experience: 6, specializations: ["Functional Training","Mobility","Sports Performance"], languages: ["Arabic","English"], client_focus: ["All Levels"] },
-  { name: "Lina Farouk", slug: "lina-farouk", title: "Yoga & Mobility Coach", years_experience: 7, specializations: ["Mobility","Rehabilitation","Weight Loss"], languages: ["Arabic","English","German"], client_focus: ["Recovery","All Levels"] },
-  { name: "Karim Adel", slug: "karim-adel", title: "Bodybuilding Coach", years_experience: 10, specializations: ["Bodybuilding","Nutrition Coaching","Strength"], languages: ["Arabic","English"], client_focus: ["Bodybuilders","Advanced"] },
-  { name: "Mona Said", slug: "mona-said", title: "Weight Loss & Nutrition Coach", years_experience: 9, specializations: ["Weight Loss","Nutrition Coaching","Beginner Training"], languages: ["Arabic","English","Italian"], client_focus: ["Beginners","Weight Loss"] },
-];
+import ContentState from "@/components/ContentState";
+import { publishedOnly } from "@/lib/content";
 
 export default function Trainers() {
   useSeo({
@@ -29,12 +20,18 @@ export default function Trainers() {
   const [trainers, setTrainers] = useState([]);
   const [query, setQuery] = useState("");
   const [activeSpec, setActiveSpec] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    base44.entities.Trainer.list("display_order").then(setTrainers).catch(() => setTrainers([]));
+    base44.entities.Trainer.list("display_order")
+      .then((records) => setTrainers(publishedOnly(records)))
+      .catch(() => { setTrainers([]); setFailed(true); })
+      .finally(() => setLoading(false));
   }, []);
 
-  const list = trainers.length ? trainers : FALLBACK;
+  const list = trainers;
+  const specializations = useMemo(() => ["All", ...new Set(list.flatMap((trainer) => trainer.specializations || []))], [list]);
 
   const filtered = useMemo(() => {
     return list.filter((t) => {
@@ -60,7 +57,7 @@ export default function Trainers() {
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search trainers…" className="w-full bg-white/[0.03] border border-white/10 pl-11 pr-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-gold focus:outline-none" />
           </div>
           <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-            {["All", ...ALL_SPECS].map((s) => (
+            {specializations.map((s) => (
               <button key={s} onClick={() => setActiveSpec(s)}
                 className={`whitespace-nowrap px-4 py-2 text-xs font-semibold tracking-wide uppercase border transition-all ${
                   activeSpec === s ? "bg-gold text-obsidian border-gold" : "border-white/10 text-white/60 hover:border-gold hover:text-gold"
@@ -73,6 +70,8 @@ export default function Trainers() {
       </section>
 
       <section className="px-5 lg:px-10 pb-24">
+        {loading && <p className="max-w-[1400px] mx-auto py-16 text-center text-white/40">Loading…</p>}
+        {!loading && list.length === 0 && <div className="max-w-[1400px] mx-auto"><ContentState title={failed ? "Trainer directory temporarily unavailable" : "Trainer profiles are being prepared"} message="Contact the gym and our team will help match you with an available coach." /></div>}
         <div className="max-w-[1400px] mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((t, i) => (
             <Reveal key={t.slug || i} delay={(i % 3) * 80}>

@@ -38,6 +38,18 @@ base44 dev     # local backend + frontend together
 
 Open the frontend URL that `base44 dev` prints (typically `http://localhost:5173`).
 
+### Public business details
+
+Configure approved public contact details in the Base44/Vite build environment. Until set, the website intentionally hides the corresponding phone, email, address, hours and WhatsApp controls rather than showing placeholders.
+
+```bash
+VITE_PUBLIC_WHATSAPP_NUMBER=201234567890
+VITE_PUBLIC_PHONE=+20 12 3456 7890
+VITE_PUBLIC_EMAIL=hello@example.com
+VITE_PUBLIC_ADDRESS=Approved public address
+VITE_PUBLIC_OPENING_HOURS=Approved opening hours
+```
+
 Notes:
 
 - **Every fresh clone needs `base44 link`.** It writes `base44/.app.jsonc` (the app-id pointer), which is deliberately gitignored. Your app id is in the Builder URL (`app.base44.com/apps/<id>/...`); `base44 link --help` shows the non-interactive flags.

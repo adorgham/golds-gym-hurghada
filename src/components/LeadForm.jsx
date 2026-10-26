@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { getAttribution } from "@/lib/attribution";
-import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import { Send, Loader2, Check } from "lucide-react";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 
@@ -46,7 +46,7 @@ export default function LeadForm({
       track(EVENTS.leadSubmit, { lead_type: leadType, product, trainer, source: sourcePage });
       setDone(true);
     } catch (err) {
-      setError(err.response?.data?.error || "Something went wrong. Please try again or contact us on WhatsApp.");
+      setError(err.response?.data?.error || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -59,12 +59,12 @@ export default function LeadForm({
           <Check className="w-7 h-7 text-gold" />
         </div>
         <h3 className="font-heading text-2xl text-white mb-2">Request Received</h3>
-        <p className="text-white/55 text-sm mb-5">Our team will reach out shortly. For an instant response, message us on WhatsApp.</p>
-        <a href={whatsappUrl("Hi, I just submitted a request on your website.")} target="_blank" rel="noreferrer"
+        <p className="text-white/55 text-sm mb-5">Our team will reach out using the contact details you provided.</p>
+        {HAS_WHATSAPP && <a href={whatsappUrl("Hi, I just submitted a request on your website.")} target="_blank" rel="noreferrer"
           onClick={() => track(EVENTS.whatsappClick, { location: "lead_form_success" })}
           className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading px-6 py-3 clip-tag">
           <WhatsAppIcon className="w-4 h-4" /> Open WhatsApp
-        </a>
+        </a>}
       </div>
     );
   }

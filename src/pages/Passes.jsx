@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
-import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import { Check, ArrowRight, Clock, MapPin } from "lucide-react";
+import ContentState from "@/components/ContentState";
+import { publishedOnly } from "@/lib/content";
 
 export default function Passes() {
   useSeo({
@@ -17,17 +19,17 @@ export default function Passes() {
   });
 
   const [passes, setPasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    base44.entities.Pass.list("display_order").then(setPasses).catch(() => setPasses([]));
+    base44.entities.Pass.list("display_order")
+      .then((records) => setPasses(publishedOnly(records)))
+      .catch(() => { setPasses([]); setFailed(true); })
+      .finally(() => setLoading(false));
   }, []);
 
-  const items = passes.length ? passes : [
-    { name: "Day Pass", slug: "day-pass", price: 200, days: 1, tagline: "Best for trying the gym", benefits: ["Full gym access for 1 day","All equipment","Locker service"], recommended_for: "Visitors & first-timers" },
-    { name: "3-Day Pass", slug: "3-day-pass", price: 500, days: 3, tagline: "Best for a long weekend", benefits: ["3 consecutive days access","All equipment","Locker service","1 group class"], recommended_for: "Weekend visitors" },
-    { name: "5-Day Pass", slug: "5-day-pass", price: 750, days: 5, tagline: "Best for a short trip", benefits: ["5 consecutive days access","All equipment","Locker service","3 group classes"], recommended_for: "Short-stay travelers" },
-    { name: "7-Day Pass", slug: "7-day-pass", price: 1000, days: 7, tagline: "Best value for a week", benefits: ["7 consecutive days access","All equipment","Locker service","Unlimited group classes","Free fitness assessment"], recommended_for: "Holidaymakers & seasonal residents", is_featured: true },
-  ];
+  const items = passes;
 
   return (
     <div className="pt-28">
@@ -38,6 +40,8 @@ export default function Passes() {
       </section>
 
       <section className="px-5 lg:px-10 pb-16">
+        {loading && <p className="max-w-[1400px] mx-auto py-16 text-center text-white/40">Loading…</p>}
+        {!loading && items.length === 0 && <div className="max-w-[1400px] mx-auto"><ContentState title={failed ? "Passes temporarily unavailable" : "Pass options are being updated"} message="Contact the gym for currently approved visitor passes and pricing." /></div>}
         <div className="max-w-[1400px] mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {items.map((p, i) => (
             <Reveal key={p.slug || i} delay={i * 70}>
@@ -67,25 +71,28 @@ export default function Passes() {
         </div>
       </section>
 
-      <section className="px-5 lg:px-10 pb-24">
+      {items.length > 0 && <section className="px-5 lg:px-10 pb-24">
         <Reveal className="max-w-[1400px] mx-auto">
           <div className="grid sm:grid-cols-3 gap-4 border border-white/10 bg-white/[0.02] p-7">
             <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-gold shrink-0" />
-              <div><div className="text-white font-semibold text-sm">Red Sea Location</div><div className="text-white/40 text-xs">Hurghada Marina</div></div>
+              <div><div className="text-white font-semibold text-sm">Hurghada location</div><div className="text-white/40 text-xs">Contact us for directions</div></div>
             </div>
             <div className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-gold shrink-0" />
-              <div><div className="text-white font-semibold text-sm">Open Daily 06:00–24:00</div><div className="text-white/40 text-xs">Train on your schedule</div></div>
+              <div><div className="text-white font-semibold text-sm">Opening hours</div><div className="text-white/40 text-xs">Confirm before your visit</div></div>
             </div>
-            <a href={whatsappUrl("Hi, I'd like to buy a gym pass.")} target="_blank" rel="noreferrer" onClick={() => track(EVENTS.whatsappClick, { location: "passes_info" })}
+            {HAS_WHATSAPP ? <a href={whatsappUrl("Hi, I'd like to ask about a gym pass.")} target="_blank" rel="noreferrer" onClick={() => track(EVENTS.whatsappClick, { location: "passes_info" })}
               className="flex items-center gap-3 hover:text-gold">
               <div className="w-10 h-10 rounded-full bg-gold/15 flex items-center justify-center text-gold"><WhatsAppIcon className="w-5 h-5" /></div>
-              <div><div className="text-white font-semibold text-sm">Buy on WhatsApp</div><div className="text-white/40 text-xs">Fast & easy</div></div>
-            </a>
+              <div><div className="text-white font-semibold text-sm">Ask about passes</div><div className="text-white/40 text-xs">Message our team</div></div>
+            </a> : <Link to="/contact" className="flex items-center gap-3 hover:text-gold">
+              <div className="w-10 h-10 rounded-full bg-gold/15 flex items-center justify-center text-gold"><ArrowRight className="w-5 h-5" /></div>
+              <div><div className="text-white font-semibold text-sm">Ask about passes</div><div className="text-white/40 text-xs">Send an enquiry</div></div>
+            </Link>}
           </div>
         </Reveal>
-      </section>
+      </section>}
     </div>
   );
 }

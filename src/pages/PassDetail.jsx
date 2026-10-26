@@ -2,28 +2,26 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
-import { track, EVENTS, whatsappUrl } from "@/lib/site";
+import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
 import LeadForm from "@/components/LeadForm";
 import { Check, X, ArrowRight, Clock } from "lucide-react";
-
-const FALLBACK = {
-  "day-pass": { name: "Day Pass", price: 200, days: 1, tagline: "Best for trying the gym", description: "Full access to Gold's Gym Hurghada for one day. Perfect for visitors who want to experience the Mecca of Fitness.", benefits: ["Full gym access for 1 day","All strength & cardio equipment","Locker & towel service","Changing rooms & showers"], restrictions: ["Valid only on day of first entry","Non-transferable"], recommended_for: "Visitors & first-timers" },
-  "3-day-pass": { name: "3-Day Pass", price: 500, days: 3, tagline: "Best for a long weekend", description: "Three consecutive days of full access. Ideal for a long weekend on the Red Sea.", benefits: ["3 consecutive days access","All equipment","Locker service","1 group class included"], restrictions: ["Days must be consecutive","Non-transferable"], recommended_for: "Weekend visitors" },
-  "5-day-pass": { name: "5-Day Pass", price: 750, days: 5, tagline: "Best for a short trip", description: "Five consecutive days of full access for short-stay travelers who want to keep their routine.", benefits: ["5 consecutive days access","All equipment","Locker service","3 group classes included"], restrictions: ["Days must be consecutive","Non-transferable"], recommended_for: "Short-stay travelers" },
-  "7-day-pass": { name: "7-Day Pass", price: 1000, days: 7, tagline: "Best value for a week", description: "A full week of unlimited access — the best value for holidaymakers and seasonal residents.", benefits: ["7 consecutive days access","All equipment","Locker service","Unlimited group classes","Free fitness assessment"], restrictions: ["Days must be consecutive","Non-transferable"], recommended_for: "Holidaymakers & seasonal residents" },
-};
+import ContentState from "@/components/ContentState";
+import { isPublished } from "@/lib/content";
 
 export default function PassDetail() {
   const { slug } = useParams();
   const [pass, setPass] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
+    setFailed(false);
     base44.entities.Pass.filter({ slug })
-      .then((r) => setPass(r?.[0] || FALLBACK[slug] || FALLBACK["day-pass"]))
-      .catch(() => setPass(FALLBACK[slug] || FALLBACK["day-pass"]))
+      .then((records) => setPass(records.find(isPublished) || null))
+      .catch(() => setFailed(true))
       .finally(() => setLoading(false));
     track(EVENTS.passView, { pass: slug, location: "pass_detail" });
   }, [slug]);
@@ -32,6 +30,7 @@ export default function PassDetail() {
     title: pass ? `${pass.name} — Gold's Gym Hurghada` : "Gym Pass",
     description: pass?.description || `Buy a ${pass?.name || "gym pass"} at Gold's Gym Hurghada.`,
     canonical: `https://goldsgymhurghada.com/passes/${slug}`,
+    noindex: !pass,
     jsonLd: breadcrumbsLd([
       { name: "Home", url: "https://goldsgymhurghada.com/" },
       { name: "Passes", url: "https://goldsgymhurghada.com/passes" },
@@ -40,6 +39,7 @@ export default function PassDetail() {
   });
 
   if (loading) return <div className="pt-32 px-5 text-white/40">Loading…</div>;
+  if (!pass) return <div className="min-h-[60vh] px-5 pb-24 pt-36 lg:px-10"><div className="mx-auto max-w-3xl"><ContentState title={failed ? "Pass details temporarily unavailable" : "Pass not found"} message="This pass is not currently published. Contact the gym for approved visitor options." actionTo="/passes" actionLabel="View available passes" /></div></div>;
   const p = pass;
 
   return (
@@ -67,11 +67,14 @@ export default function PassDetail() {
               <span className="text-gold font-semibold text-xl">{p.currency || "EGP"}</span>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={whatsappUrl(`Hi, I'd like to buy the ${p.name} (${p.price} ${p.currency || "EGP"}).`)} target="_blank" rel="noreferrer"
+              {HAS_WHATSAPP ? <a href={whatsappUrl(`Hi, I'd like to request the ${p.name} (${p.price} ${p.currency || "EGP"}).`)} target="_blank" rel="noreferrer"
                 onClick={() => track(EVENTS.passSelect, { pass: slug, location: "pass_detail" })}
                 className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-8 py-4 hover:brightness-110 transition-all clip-tag">
-                <WhatsAppIcon className="w-4 h-4" /> BUY THIS PASS <ArrowRight className="w-4 h-4" />
-              </a>
+                <WhatsAppIcon className="w-4 h-4" /> REQUEST THIS PASS <ArrowRight className="w-4 h-4" />
+              </a> : <Link to="/contact" onClick={() => track(EVENTS.passSelect, { pass: slug, location: "pass_detail" })}
+                className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-8 py-4 hover:brightness-110 transition-all clip-tag">
+                REQUEST THIS PASS <ArrowRight className="w-4 h-4" />
+              </Link>}
               <Link to="/facilities" className="inline-flex items-center border border-white/20 text-white font-heading tracking-wide px-8 py-4 hover:border-gold hover:text-gold transition-all">
                 SEE FACILITIES
               </Link>
