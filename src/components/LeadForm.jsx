@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { getAttribution } from "@/lib/attribution";
 import { track, EVENTS, whatsappUrl } from "@/lib/site";
 import { Send, Loader2, Check } from "lucide-react";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 
 export default function LeadForm({
   leadType = "contact",
-  product,
-  service,
-  trainer,
-  sourcePage,
+  product = "",
+  service = "",
+  trainer = "",
+  sourcePage = "",
   title = "Request Information",
-  subtitle,
+  subtitle = "",
   ctaLabel = "Submit Request",
   variant = "default",
 }) {
@@ -21,6 +22,8 @@ export default function LeadForm({
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const [website, setWebsite] = useState("");
+  const formStartedAt = useRef(Date.now());
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -29,19 +32,21 @@ export default function LeadForm({
     setLoading(true);
     setError("");
     try {
-      await base44.entities.Lead.create({
+      await base44.functions.invoke("submit-lead", {
         ...form,
         lead_type: leadType,
         product,
         service,
         trainer,
         source_page: sourcePage || window.location.pathname,
-        status: "New",
+        website,
+        form_started_at: formStartedAt.current,
+        ...getAttribution(),
       });
       track(EVENTS.leadSubmit, { lead_type: leadType, product, trainer, source: sourcePage });
       setDone(true);
     } catch (err) {
-      setError("Something went wrong. Please try again or contact us on WhatsApp.");
+      setError(err.response?.data?.error || "Something went wrong. Please try again or contact us on WhatsApp.");
     } finally {
       setLoading(false);
     }
@@ -68,6 +73,10 @@ export default function LeadForm({
 
   return (
     <form onSubmit={submit} className={variant === "compact" ? "space-y-3" : "space-y-4"}>
+      <div className="absolute -left-[10000px]" aria-hidden="true">
+        <label htmlFor="website">Website</label>
+        <input id="website" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+      </div>
       {title && <h3 className="font-heading text-2xl text-white">{title}</h3>}
       {subtitle && <p className="text-white/55 text-sm">{subtitle}</p>}
       <div className="grid sm:grid-cols-2 gap-3">

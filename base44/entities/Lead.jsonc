@@ -32,6 +32,13 @@
     "campaign": {
       "type": "string"
     },
+    "utm_source": { "type": "string" },
+    "utm_medium": { "type": "string" },
+    "utm_campaign": { "type": "string" },
+    "utm_term": { "type": "string" },
+    "utm_content": { "type": "string" },
+    "landing_page": { "type": "string" },
+    "referrer": { "type": "string" },
     "lead_type": {
       "type": "string",
       "enum": [
@@ -61,7 +68,11 @@
     "lead_type"
   ],
   "rls": {
-    "create": null,
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
     "read": {
       "user_condition": {
         "role": "admin"

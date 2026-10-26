@@ -33,7 +33,9 @@ export default function Admin() {
   useSeo({ title: "Admin — CMS", description: "Staff dashboard", noindex: true });
   const { user } = useAuth();
   const [tab, setTab] = useState("leads");
-  const [data, setData] = useState({});
+  const [data, setData] = useState({
+    leads: [], bookings: [], trainers: [], members: [], memberships: [], media: [], passes: [], articles: [],
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,7 +62,8 @@ export default function Admin() {
   const updateStatus = async (entity, id, status) => {
     try {
       await base44.entities[entity].update(id, { status });
-      setData((d) => ({ ...d, [entity]: d[entity].map((r) => (r.id === id ? { ...r, status } : r)) }));
+      const dataKey = entity === "Lead" ? "leads" : "bookings";
+      setData((d) => ({ ...d, [dataKey]: d[dataKey].map((r) => (r.id === id ? { ...r, status } : r)) }));
     } catch (e) { alert("Update failed"); }
   };
 

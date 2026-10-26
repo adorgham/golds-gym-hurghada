@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { getAttribution } from "@/lib/attribution";
 import { useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, whatsappUrl } from "@/lib/site";
 import Reveal from "@/components/Reveal";
@@ -29,6 +30,9 @@ export default function TrainerDetail() {
   const [booking, setBooking] = useState({ preferred_date: "", preferred_time: "", training_goal: "", is_member: false, name: "", phone: "", whatsapp: "", email: "" });
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [submissionError, setSubmissionError] = useState("");
+  const [website, setWebsite] = useState("");
+  const formStartedAt = useRef(Date.now());
 
   useEffect(() => {
     base44.entities.Trainer.filter({ slug })
@@ -57,12 +61,21 @@ export default function TrainerDetail() {
   const submit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    setSubmissionError("");
     try {
-      await base44.entities.Booking.create({ ...booking, trainer_id: t.id, trainer_name: t.name, source_page: `/trainers/${slug}`, status: "New" });
+      await base44.functions.invoke("submit-pt-enquiry", {
+        ...booking,
+        trainer_id: t.id,
+        trainer_name: t.name,
+        source_page: `/trainers/${slug}`,
+        website,
+        form_started_at: formStartedAt.current,
+        ...getAttribution(),
+      });
       track(EVENTS.trainerBookingSubmit, { trainer: t.name, source: "trainer_detail" });
       setDone(true);
     } catch (err) {
-      alert("Could not submit. Please try WhatsApp.");
+      setSubmissionError(err.response?.data?.error || "Could not submit. Please try WhatsApp.");
     } finally {
       setSubmitting(false);
     }
@@ -190,6 +203,10 @@ export default function TrainerDetail() {
                   <h3 className="font-heading text-2xl text-white mb-1">BOOK A SESSION</h3>
                   <p className="text-white/45 text-sm mb-5">with {t.name}</p>
                   <form onSubmit={submit} className="space-y-3">
+                    <div className="absolute -left-[10000px]" aria-hidden="true">
+                      <label htmlFor="booking-website">Website</label>
+                      <input id="booking-website" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+                    </div>
                     <div className="grid grid-cols-2 gap-3">
                       <input required type="date" value={booking.preferred_date} onChange={(e) => setBooking((b) => ({ ...b, preferred_date: e.target.value }))} className={field} />
                       <input required type="time" value={booking.preferred_time} onChange={(e) => setBooking((b) => ({ ...b, preferred_time: e.target.value }))} className={field} />
@@ -205,6 +222,7 @@ export default function TrainerDetail() {
                       <input type="checkbox" checked={booking.is_member} onChange={(e) => setBooking((b) => ({ ...b, is_member: e.target.checked }))} className="accent-[#D4AF37]" />
                       I'm an existing member
                     </label>
+                    {submissionError && <p className="text-red-400 text-sm" role="alert">{submissionError}</p>}
                     <button type="submit" disabled={submitting} className="w-full inline-flex items-center justify-center gap-2 bg-gold text-obsidian font-heading tracking-wide py-3.5 hover:brightness-110 disabled:opacity-60 transition-all clip-tag">
                       {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Calendar className="w-4 h-4" />} REQUEST SESSION
                     </button>

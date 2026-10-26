@@ -1,6 +1,6 @@
 import Reveal from "@/components/Reveal";
 
-export default function SectionHeading({ eyebrow, title, accent, subtitle, align = "left", light = false }) {
+export default function SectionHeading({ eyebrow = "", title, accent = "", subtitle = "", align = "left", light = false }) {
   return (
     <Reveal className={align === "center" ? "text-center" : ""}>
       {eyebrow && (

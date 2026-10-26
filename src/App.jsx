@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -26,6 +27,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import { captureAttribution } from '@/lib/attribution';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -89,6 +91,9 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  useEffect(() => {
+    captureAttribution();
+  }, []);
 
   return (
     <AuthProvider>

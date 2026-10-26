@@ -48,8 +48,10 @@ export default function MediaLibrary() {
     const form = new FormData(event.currentTarget);
     const values = Object.fromEntries(form.entries());
     const isDecorative = form.get("is_decorative") === "on";
-    if (!isDecorative && !values.alt_text.trim()) return setError("Alt text is required unless this image is decorative.");
-    const data = { ...editing, ...values, is_decorative: isDecorative, alt_text: isDecorative ? "" : values.alt_text.trim(), tags: values.tags.split(",").map((tag) => tag.trim()).filter(Boolean) };
+    const altText = String(form.get("alt_text") || "").trim();
+    const tags = String(form.get("tags") || "").split(",").map((tag) => tag.trim()).filter(Boolean);
+    if (!isDecorative && !altText) return setError("Alt text is required unless this image is decorative.");
+    const data = { ...editing, ...values, is_decorative: isDecorative, alt_text: isDecorative ? "" : altText, tags };
     delete data.isNew;
     setError("");
     try {

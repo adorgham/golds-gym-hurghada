@@ -37,7 +37,7 @@ function setJsonLd(id, data) {
   document.head.appendChild(script);
 }
 
-export function useSeo({ title, description, canonical, image, jsonLd, noindex }) {
+export function useSeo({ title = "", description = "", canonical = "", image = "", jsonLd = null, noindex = false }) {
   useEffect(() => {
     const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
     document.title = fullTitle;

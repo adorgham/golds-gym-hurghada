@@ -1,0 +1,152 @@
+# Gold's Gym Hurghada — Delivery Plan to GTM
+
+**Status:** Sprint 1 in progress
+
+**Planning basis:** repository audit completed 2026-10-26
+
+**Scope rule:** model only what must remain canonical; implement only confirmed launch flows.
+
+## Delivery guardrails
+
+- `REQUIRED NOW`: production marketing website, public content, enquiries, SEO/AIO, analytics, operations and release readiness.
+- `DEPENDENCY NOW`: the smallest secure Base44 entities, permissions and backend functions required by those public flows.
+- `FUTURE-READY ONLY`: member account expansion, online sales, entitlements, booking/waitlists, attendance, QR check-in, notifications and mobile application.
+- Base44 remains the shared backend. Do not introduce parallel website-only records or a second backend.
+- No entity synchronization, remote development session, production data write, publish, domain cutover or indexation change without a reviewed migration/release checkpoint.
+
+## Sprint 1 — Technical foundation and release controls
+
+### Scope
+
+| Item | Classification | Status | Acceptance criteria |
+| --- | --- | --- | --- |
+| Canonicalize local Base44 schemas and identify migration risk | DEPENDENCY NOW | Implemented locally; remote review pending | One file per entity; invalid custom `User.role` override removed; remote diff reviewed before synchronization |
+| Secure public lead and PT enquiry writes | REQUIRED NOW | Implemented locally | Browser cannot choose workflow status; backend validates and bounds input; public direct entity create is denied |
+| Capture first-touch campaign attribution | REQUIRED NOW | Implemented locally | UTM fields, landing page and referrer reach Lead/Booking records without blocking submission |
+| Keep public pages usable with an expired optional auth token | REQUIRED NOW | Implemented locally | A failed optional `auth.me()` does not redirect the public website; protected admin route remains protected |
+| Normalize explicit public-read permissions | DEPENDENCY NOW | Implemented locally | Public content entities use explicit `read: true`; all writes remain admin-only |
+| Establish a useful engineering baseline | REQUIRED NOW | Implemented locally | lint, typecheck, build and CI gates pass; Base44 build is separately verified before release |
+| Confirm rendering/hosting path | REQUIRED NOW | Decision pending | staging crawl demonstrates acceptable discoverability or prerender/hosting work is promoted before launch |
+| Define staging, release and recovery procedure | REQUIRED NOW | Documented here | release gates, rollback inputs and production no-go actions are explicit |
+
+### Validation commands
+
+```bash
+npm run check
+npm run lint
+npm run typecheck
+npm run build
+npx base44 whoami
+npx base44 build
+base44 dev
+```
+
+`base44 dev` must use the local ephemeral backend. Do not use `base44 dev --remote` for acceptance testing because it writes to production data.
+
+Local results on 2026-10-26: lint passed, typecheck passed, Vite build passed, and `npx base44 build` completed with the linked app ID. End-to-end function execution remains pending because Deno is not installed and no non-production Base44 environment has yet been confirmed.
+
+### Migration and release notes
+
+1. Export or inventory the remote entities before synchronization.
+2. Review the remote-to-local schema diff, especially Lead, Booking and duplicate entity filenames.
+3. Deploy the two submission functions and schema permission changes in the same reviewed release.
+4. Smoke-test anonymous lead and PT enquiry submissions locally, then in a non-production/staging environment.
+5. Confirm records are visible only to an administrator and that status is always created as `New`.
+6. Confirm Base44's native function abuse limits or add an approved rate-limit control; honeypot/timing validation alone is not a production rate limit.
+7. Keep the site-wide `noindex` controls enabled through staging. Remove them only in the production cutover sprint.
+
+### Sprint 1 no-go actions
+
+- Do not push/synchronize entities until the remote inventory and migration diff are reviewed.
+- Do not use the hosted production backend for form testing.
+- Do not enable search indexing or change the production domain.
+- Do not expose anonymous functions in production until the rate-limit/abuse-control gate is confirmed.
+- Do not implement payments, member entitlements, class booking, waitlists or QR check-in.
+- Do not treat fallback/demo content as launch content.
+
+## Sprint 2 — Public journeys and launch CMS
+
+### Scope
+
+- `REQUIRED NOW`: complete and verify Home, Memberships, Passes, Personal Training, Trainers, Facilities, About, Contact and legal/policy pages.
+- `REQUIRED NOW`: remove fabricated fallback content from production behavior; define honest empty/error states.
+- `REQUIRED NOW`: complete the admin workflows needed to manage launch content, offers, trainers, media, leads and PT enquiries.
+- `REQUIRED NOW`: fix public routing/content defects, including article section resolution and admin workflow state updates.
+- `DEPENDENCY NOW`: seed/import approved launch content with stable slugs and data-integrity checks.
+- `FUTURE-READY ONLY`: richer member account and commercial fulfillment remain out of scope.
+
+### Acceptance criteria
+
+- Every public CTA has an approved destination and tested success/failure path.
+- Admin users can manage all launch content without direct database editing.
+- Anonymous users cannot read lead, booking, member or operational records.
+- No fabricated trainer, price, schedule or article can appear when backend data is missing.
+- Responsive and accessibility smoke tests pass on the agreed browser/device matrix.
+
+## Sprint 3 — Group class schedule
+
+### Scope
+
+- `REQUIRED NOW`: implement the approved public weekly schedule and admin maintenance workflow from `docs/10-group-class-schedule-upgrade.md`.
+- `DEPENDENCY NOW`: canonical Class, Trainer and schedule records; recurrence/override model only to the extent needed for reliable published schedules.
+- `FUTURE-READY ONLY`: capacity consumption, booking, waitlists and attendance.
+
+### Acceptance criteria
+
+- Admin can publish and amend a recurring weekly schedule plus date-specific exceptions.
+- Public day/week views resolve the same canonical records and work on mobile.
+- Closed/cancelled/moved sessions do not require copied monthly schedules.
+- Booking controls and live capacity claims are absent until those workflows are approved.
+
+## Sprint 4 — SEO, analytics and quality hardening
+
+### Scope
+
+- `REQUIRED NOW`: metadata, canonicals, structured data, sitemap, robots rules, internal links, analytics event contract and campaign attribution verification.
+- `REQUIRED NOW`: performance, accessibility, security and cross-browser remediation.
+- `DEPENDENCY NOW`: validate Base44 SPA rendering with Google/search tooling; introduce prerendering only if evidence shows the current rendering path is insufficient.
+
+### Acceptance criteria
+
+- All indexable URLs return correct canonical/meta/structured content and are present in the sitemap.
+- Private/admin/auth pages remain excluded.
+- Analytics records the approved funnel without collecting unnecessary sensitive data.
+- Performance and accessibility budgets are agreed and met on representative mobile hardware.
+
+## Sprint 5 — UAT and production readiness
+
+### Scope and acceptance criteria
+
+- Approved production content, prices, contact details, policies, domain and measurement IDs are loaded.
+- Anonymous/public, administrator, enquiry and failure/retry journeys pass UAT.
+- Backups/export, release owner, rollback procedure and incident contacts are confirmed.
+- Base44 build/publish process is rehearsed from the Git-backed source of truth.
+- No P0/P1 defects remain; accepted lower-priority defects are documented with owners.
+
+## Sprint 6 — GTM kickoff and controlled launch
+
+### Sequence
+
+1. Freeze launch content and code.
+2. Publish the reviewed Base44 release from the Git-backed workflow.
+3. Complete domain/DNS and HTTPS checks.
+4. Run production smoke tests without destructive data.
+5. Remove `noindex` and blocking robots directives only after the canonical production domain is verified.
+6. Submit sitemap and start the launch monitoring window.
+7. Monitor enquiries, errors, analytics, indexing and page performance; use the documented rollback path if launch gates regress.
+
+## Recovery baseline
+
+- Git commit/tag identifies every release candidate and production release.
+- Remote entity inventory/export is captured before schema-affecting publication.
+- Rollback means republishing the last known-good Git state; data rollback is a separate, explicitly approved operation.
+- Submission failures must retain WhatsApp/phone fallbacks and must not expose internal errors or personal data in logs.
+
+## Decision points requiring owner approval
+
+1. Confirm the canonical production domain: `www.goldsgymhurgahda.co` in `PROJECT.md` conflicts with `goldsgymhurghada.com` in the current code.
+2. Confirm official phone, WhatsApp number, email, address, opening hours and map location; current values are placeholders.
+3. Confirm whether launch includes enquiry-only memberships/passes or online payment and fulfillment. Recommendation: enquiry-only for GTM unless a payment provider, policies and operational owner are already confirmed.
+4. Confirm whether PT is an enquiry/request or a real-time booking commitment. Recommendation: keep it as a request for launch.
+5. Approve launch content, prices, trainer roster, schedule ownership and legal/policy copy.
+6. Confirm Base44 staging/non-production environment availability and the staff administrator accounts permitted to run UAT.

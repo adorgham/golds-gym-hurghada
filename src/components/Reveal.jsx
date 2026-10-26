@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
+/**
+ * @param {{children?: import("react").ReactNode, className?: string, delay?: number, as?: import("react").ElementType}} props
+ */
 export default function Reveal({ children, className = "", delay = 0, as: Tag = "div" }) {
   const ref = useRef(null);
   const [shown, setShown] = useState(false);
