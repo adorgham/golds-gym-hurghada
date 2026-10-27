@@ -161,7 +161,7 @@ export default function ClassSchedule() {
 }
 
 function FilterGroup({ label, children }) {
-  return <fieldset><legend className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">{label}</legend><div className="flex gap-2 overflow-x-auto hide-scrollbar">{children}</div></fieldset>;
+  return <fieldset className="min-w-0 max-w-full"><legend className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">{label}</legend><div className="flex max-w-full gap-2 overflow-x-auto hide-scrollbar">{children}</div></fieldset>;
 }
 
 function FilterButton({ active, onClick, children }) {
@@ -193,7 +193,7 @@ function MobileDay({ date, day, sessions }) {
 }
 
 function DayView({ date, sessions, week, onChooseDate }) {
-  return <section className="px-5 pb-24 lg:px-10"><div className="mx-auto max-w-[1000px]"><div className="mb-6 flex gap-2 overflow-x-auto hide-scrollbar">{week.map((item) => <button type="button" key={item} onClick={() => onChooseDate(item)} aria-pressed={date === item} className={`min-w-20 border px-3 py-2 text-center ${date === item ? "border-gold bg-gold text-obsidian" : "border-white/10 text-white/60"}`}><span className="block text-[10px] font-semibold uppercase">{formatScheduleDate(item, { weekday: "short" })}</span><span className="font-heading text-lg">{formatScheduleDate(item, { day: "numeric" })}</span></button>)}</div>{sessions.length > 0 ? <div className="space-y-3">{sessions.map((session) => <SessionCard key={session.occurrence_id} session={session} />)}</div> : <ContentState compact title="No matching classes on this day" message="Choose another day or clear the active filters." actionTo={null} />}</div></section>;
+  return <section className="min-w-0 px-5 pb-24 lg:px-10"><div className="mx-auto min-w-0 max-w-[1000px]"><div className="mb-6 flex max-w-full gap-2 overflow-x-auto hide-scrollbar">{week.map((item) => <button type="button" key={item} onClick={() => onChooseDate(item)} aria-pressed={date === item} className={`min-w-20 border px-3 py-2 text-center ${date === item ? "border-gold bg-gold text-obsidian" : "border-white/10 text-white/60"}`}><span className="block text-[10px] font-semibold uppercase">{formatScheduleDate(item, { weekday: "short" })}</span><span className="font-heading text-lg">{formatScheduleDate(item, { day: "numeric" })}</span></button>)}</div>{sessions.length > 0 ? <div className="space-y-3">{sessions.map((session) => <SessionCard key={session.occurrence_id} session={session} />)}</div> : <ContentState compact title="No matching classes on this day" message="Choose another day or clear the active filters." actionTo={null} />}</div></section>;
 }
 
 function SessionCard({ session, compact = false }) {
