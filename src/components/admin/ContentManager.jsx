@@ -48,7 +48,7 @@ function displayValue(record, column) {
   return value ?? "—";
 }
 
-export default function ContentManager({ entityName, label, items, fields, columns, publicPath, onChange }) {
+export default function ContentManager({ entityName, label, items, fields, columns, publicPath = null, onChange }) {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -188,6 +188,19 @@ const seoFields = [
 ];
 
 export const CONTENT_CONFIG = {
+  classes: {
+    entityName: "FitnessClass", label: "Class catalogue",
+    columns: [{ name: "name", label: "Name" }, { name: "category", label: "Category" }, { name: "difficulty", label: "Level" }, { name: "is_published", label: "Published" }],
+    fields: [
+      { name: "name", label: "Name", required: true }, { name: "slug", label: "Slug", type: "slug", required: true },
+      { name: "category", label: "Category", required: true }, { name: "difficulty", label: "Level", type: "select", options: ["Beginner", "Intermediate", "Advanced", "All Levels"] },
+      { name: "duration_minutes", label: "Default duration (minutes)", type: "number", min: 1 },
+      { name: "default_studio", label: "Default studio", type: "select", options: ["aerobics", "spinning", "martial_arts", "floor"] },
+      { name: "default_access_types", label: "Default access codes", type: "list", help: "Use: all, prepaid, ladies_only and/or kids" },
+      { name: "description", label: "Description", type: "textarea" },
+      { name: "image_url", label: "Image URL" }, publishField, ...seoFields,
+    ],
+  },
   trainers: {
     entityName: "Trainer", label: "Trainers", publicPath: (item) => `/trainers/${item.slug}`,
     columns: [{ name: "name", label: "Name" }, { name: "title", label: "Title" }, { name: "specializations", label: "Specializations" }, { name: "is_published", label: "Published" }],

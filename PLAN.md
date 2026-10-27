@@ -1,6 +1,6 @@
 # Gold's Gym Hurghada — Delivery Plan to GTM
 
-**Status:** Sprint 2 implemented locally; content approval and staging UAT pending
+**Status:** Sprint 3 implemented locally; remote migration review, approved schedule data and staging UAT pending
 
 **Planning basis:** repository audit completed 2026-10-26
 
@@ -109,9 +109,16 @@ Local results on 2026-10-26: lint, typecheck, Vite production build and Base44 p
 
 ### Scope
 
-- `REQUIRED NOW`: implement the approved public weekly schedule and admin maintenance workflow from `docs/10-group-class-schedule-upgrade.md`.
-- `DEPENDENCY NOW`: canonical Class, Trainer and schedule records; recurrence/override model only to the extent needed for reliable published schedules.
-- `FUTURE-READY ONLY`: capacity consumption, booking, waitlists and attendance.
+| Item | Classification | Status |
+| --- | --- | --- |
+| Preserve `ClassSession` as the canonical recurring weekly rule | DEPENDENCY NOW | Implemented locally; remote migration review pending |
+| Resolve recurring rules, date-specific overrides and one-off sessions in `Africa/Cairo` | REQUIRED NOW | Implemented locally |
+| Add independent Studio and Members/Access filters with URL state | REQUIRED NOW | Implemented locally |
+| Provide responsive public week/day views with cancellations and amendments labelled | REQUIRED NOW | Implemented locally; populated browser UAT pending |
+| Add class catalogue and low-friction schedule administration | REQUIRED NOW | Implemented locally; staff UAT pending |
+| Support “this occurrence” and versioned “this and future” changes | REQUIRED NOW | Implemented locally |
+| Preserve stable dated occurrence keys for future consumers | DEPENDENCY NOW | Implemented locally |
+| Capacity consumption, booking, waitlists, attendance and notifications | FUTURE-READY ONLY | Deferred |
 
 ### Acceptance criteria
 
@@ -119,6 +126,28 @@ Local results on 2026-10-26: lint, typecheck, Vite production build and Base44 p
 - Public day/week views resolve the same canonical records and work on mobile.
 - Closed/cancelled/moved sessions do not require copied monthly schedules.
 - Booking controls and live capacity claims are absent until those workflows are approved.
+
+### Validation commands
+
+```bash
+npm run test:schedule
+npm run check
+npx base44 build
+```
+
+The schedule resolver validation covers Cairo-week boundaries, date-only cancellation, amended time/trainer/studio/access, one-off sessions, combined filters and invalid date handling.
+
+### Migration notes
+
+1. Export/inventory remote `FitnessClass`, `ClassSession` and `Trainer` records before schema synchronization.
+2. `ClassSession` remains the recurring base record; do not copy it into a second website-only schedule table.
+3. Map every existing session to a canonical `FitnessClass` and, where possible, a canonical `Trainer`. Leave unknown trainers unassigned; normalize `Diann` to `Diana` only when that source value exists.
+4. Map legacy `room` values to `studio`: `aerobics`, `spinning`, `martial_arts` or `floor`. Do not infer access rules from room or category.
+5. Populate `access_types` from approved source data. An empty/unset legacy value resolves to unrestricted `all`; overlapping values such as `kids` plus `prepaid` remain supported.
+6. Existing records without `is_published` remain visible for migration compatibility. Explicitly review and set publication state during migration.
+7. Add `ScheduleOverride` and `OneOffSession` only after reviewing the remote schema diff. Enforce one override per recurring-session/date pair; the admin reports duplicate keys for cleanup.
+8. Verify at least two historical periods and recurrence boundaries before launch. No schedule source data was invented or seeded during implementation.
+9. Do not publish or synchronize from the local tree until the Sprint 1 remote inventory/release gate is complete.
 
 ## Sprint 4 — SEO, analytics and quality hardening
 

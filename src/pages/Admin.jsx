@@ -7,10 +7,12 @@ import { useAuth } from "@/lib/AuthContext";
 import MembersSection from "@/components/admin/MembersSection";
 import MediaLibrary from "@/components/admin/MediaLibrary";
 import ContentManager, { CONTENT_CONFIG } from "@/components/admin/ContentManager";
+import ScheduleManager from "@/components/admin/ScheduleManager";
 
 const TABS = [
   { id: "leads", label: "Leads", icon: Mail },
   { id: "bookings", label: "Bookings", icon: Calendar },
+  { id: "schedule", label: "Schedule", icon: Calendar },
   { id: "trainers", label: "Trainers", icon: UserCog },
   { id: "members", label: "Members", icon: TrendingUp },
   { id: "memberships", label: "Memberships", icon: TrendingUp },
@@ -36,7 +38,7 @@ export default function Admin() {
   const { user } = useAuth();
   const [tab, setTab] = useState("leads");
   const [data, setData] = useState({
-    leads: [], bookings: [], trainers: [], members: [], memberships: [], media: [], passes: [], articles: [], pages: [],
+    leads: [], bookings: [], trainers: [], members: [], memberships: [], media: [], passes: [], articles: [], pages: [], classes: [], recurring: [], overrides: [], oneOffs: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -56,8 +58,12 @@ export default function Admin() {
       base44.entities.Pass.list().catch(() => []),
       base44.entities.Article.list("-created_date").catch(() => []),
       base44.entities.SitePage.list().catch(() => []),
-    ]).then(([leads, bookings, trainers, memberships, members, media, passes, articles, pages]) => {
-      setData({ leads, bookings, trainers, memberships, members, media, passes, articles, pages });
+      base44.entities.FitnessClass.list().catch(() => []),
+      base44.entities.ClassSession.list().catch(() => []),
+      base44.entities.ScheduleOverride.list().catch(() => []),
+      base44.entities.OneOffSession.list().catch(() => []),
+    ]).then(([leads, bookings, trainers, memberships, members, media, passes, articles, pages, classes, recurring, overrides, oneOffs]) => {
+      setData({ leads, bookings, trainers, memberships, members, media, passes, articles, pages, classes, recurring, overrides, oneOffs });
       setLoading(false);
     });
   }, [user?.role]);
@@ -73,6 +79,7 @@ export default function Admin() {
   const counts = {
     leads: data.leads?.length || 0,
     bookings: data.bookings?.length || 0,
+    schedule: (data.recurring?.length || 0) + (data.oneOffs?.length || 0),
     trainers: data.trainers?.length || 0,
     members: data.members?.length || 0,
     memberships: data.memberships?.length || 0,
@@ -97,7 +104,7 @@ export default function Admin() {
           <Link to="/" className="text-sm text-gold hover:underline">← Back to site</Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-3 mb-8">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex flex-col items-center gap-1 p-4 border transition-all ${tab === t.id ? "border-gold bg-gold/10" : "border-white/10 hover:border-gold/50"}`}>
@@ -151,6 +158,8 @@ export default function Admin() {
                 {(data.bookings || []).length === 0 && <tr><td className="p-8 text-white/30 text-center">No bookings yet.</td></tr>}
               </Table>
             )}
+
+            {tab === "schedule" && <ScheduleManager data={{ classes: data.classes, trainers: data.trainers, recurring: data.recurring, overrides: data.overrides, oneOffs: data.oneOffs }} setData={(updater) => setData((current) => { const schedule = typeof updater === "function" ? updater({ classes: current.classes, trainers: current.trainers, recurring: current.recurring, overrides: current.overrides, oneOffs: current.oneOffs }) : updater; return { ...current, ...schedule }; })} />}
 
             {tab === "trainers" && <ContentManager {...CONTENT_CONFIG.trainers} items={data.trainers} onChange={(items) => setData((current) => ({ ...current, trainers: items }))} />}
 

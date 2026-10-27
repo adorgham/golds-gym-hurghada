@@ -9,6 +9,7 @@ import SectionHeading from "@/components/SectionHeading";
 import { ArrowRight, Dumbbell, Flame, Users, Activity, Heart, Zap } from "lucide-react";
 import ContentState from "@/components/ContentState";
 import { publishedOnly } from "@/lib/content";
+import { addDays, getCairoToday, resolveSchedule } from "@/lib/schedule";
 
 const HERO_IMG = "https://images.unsplash.com/photo-1534438327276-1ff8e2a4f5a3?auto=format&fit=crop&w=2000&q=80";
 const EXPERIENCE_IMG = "https://images.unsplash.com/photo-1571902943202-507ec2610f02?auto=format&fit=crop&w=1600&q=80";
@@ -42,12 +43,17 @@ export default function Home() {
     base44.entities.Pass.list("display_order").catch(() => []),
     base44.entities.Trainer.filter({ is_featured: true }).catch(() => base44.entities.Trainer.list().catch(() => [])),
     base44.entities.ClassSession.list().catch(() => []),
+    base44.entities.ScheduleOverride.list().catch(() => []),
+    base44.entities.OneOffSession.list().catch(() => []),
+    base44.entities.FitnessClass.list().catch(() => []),
+    base44.entities.Trainer.list().catch(() => []),
     base44.entities.Article.filter({ is_featured: true }).catch(() => base44.entities.Article.list("-published_date", 4).catch(() => []))]
-    ).then(([m, p, t, s, a]) => {
+    ).then(([m, p, t, recurring, overrides, oneOffs, classes, allTrainers, a]) => {
+      const today = getCairoToday();
       setMemberships(publishedOnly(m));
       setPasses(publishedOnly(p));
       setTrainers(publishedOnly(t));
-      setSessions(s || []);
+      setSessions(resolveSchedule({ recurring, overrides, oneOffs, classes, trainers: allTrainers, fromDate: today, toDate: addDays(today, 13) }).filter((session) => !session.is_cancelled));
       setArticles(publishedOnly(a));
     });
   }, []);

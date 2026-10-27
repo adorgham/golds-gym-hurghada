@@ -1,0 +1,34 @@
+{
+  "name": "ScheduleOverride",
+  "type": "object",
+  "properties": {
+    "recurring_session_id": { "type": "string" },
+    "effective_date": { "type": "string", "format": "date" },
+    "change_type": { "type": "string", "enum": ["Cancel", "Modify"] },
+    "replacement_trainer_id": { "type": "string" },
+    "replacement_trainer_name": { "type": "string" },
+    "remove_trainer": { "type": "boolean", "default": false },
+    "replacement_start_time": { "type": "string" },
+    "replacement_duration_minutes": { "type": "number" },
+    "replacement_studio": {
+      "type": "string",
+      "enum": ["aerobics", "spinning", "martial_arts", "floor"]
+    },
+    "replacement_access_types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["all", "prepaid", "ladies_only", "kids"]
+      }
+    },
+    "notes": { "type": "string" },
+    "is_published": { "type": "boolean", "default": false }
+  },
+  "required": ["recurring_session_id", "effective_date", "change_type"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": true,
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}

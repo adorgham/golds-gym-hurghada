@@ -1,0 +1,39 @@
+{
+  "name": "OneOffSession",
+  "type": "object",
+  "properties": {
+    "class_id": { "type": "string" },
+    "class_name": { "type": "string" },
+    "trainer_id": { "type": "string" },
+    "trainer_name": { "type": "string" },
+    "session_date": { "type": "string", "format": "date" },
+    "start_time": { "type": "string" },
+    "duration_minutes": { "type": "number" },
+    "difficulty": { "type": "string" },
+    "studio": {
+      "type": "string",
+      "enum": ["aerobics", "spinning", "martial_arts", "floor"]
+    },
+    "access_types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["all", "prepaid", "ladies_only", "kids"]
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["Scheduled", "Cancelled"],
+      "default": "Scheduled"
+    },
+    "notes": { "type": "string" },
+    "is_published": { "type": "boolean", "default": false }
+  },
+  "required": ["class_name", "session_date", "start_time", "duration_minutes", "studio"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": true,
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}
