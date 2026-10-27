@@ -21,6 +21,10 @@ export const EVENTS = {
   whatsappClick: "whatsapp_click",
   phoneClick: "phone_click",
   emailClick: "email_click",
+  scheduleDateSelect: "schedule_date_select",
+  scheduleFilterApply: "schedule_filter_apply",
+  scheduleViewChange: "schedule_view_change",
+  scheduleWeekNavigate: "schedule_week_navigate",
 };
 
 export const WHATSAPP_NUMBER = String(import.meta.env.VITE_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, "");

@@ -27,7 +27,7 @@ export default function Home() {
   useSeo({
     title: "The Mecca of Fitness",
     description: "Gold's Gym Hurghada — train stronger, move better, become more. Memberships, day passes, group classes and elite personal trainers on the Red Sea.",
-    canonical: "https://goldsgymhurghada.com/",
+    canonical: "/",
     jsonLd: organizationLd
   });
 

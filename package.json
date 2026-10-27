@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/generate-seo-assets.mjs",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
     "test:schedule": "node scripts/validate-schedule.mjs",
-    "check": "npm run lint && npm run typecheck && npm run test:schedule && npm run build",
+    "test:seo": "node scripts/validate-seo-assets.mjs",
+    "check": "npm run lint && npm run typecheck && npm run test:schedule && npm run build && npm run test:seo",
     "preview": "vite preview"
   },
   "dependencies": {

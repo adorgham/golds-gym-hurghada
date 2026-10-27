@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
@@ -15,8 +15,8 @@ export default function Memberships() {
   useSeo({
     title: "Memberships",
     description: "Choose your Gold's Gym Hurghada membership. Monthly plans for residents and regular members — full access to the Mecca of Fitness on the Red Sea.",
-    canonical: "https://goldsgymhurghada.com/memberships",
-    jsonLd: breadcrumbsLd([{ name: "Home", url: "https://goldsgymhurghada.com/" }, { name: "Memberships", url: "https://goldsgymhurghada.com/memberships" }]),
+    canonical: "/memberships",
+    jsonLd: breadcrumbsLd([{ name: "Home", url: absoluteUrl("/") }, { name: "Memberships", url: absoluteUrl("/memberships") }]),
   });
 
   const [items, setItems] = useState([]);

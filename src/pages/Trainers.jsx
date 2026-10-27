@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS } from "@/lib/site";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
@@ -13,8 +13,8 @@ export default function Trainers() {
   useSeo({
     title: "Personal Trainers",
     description: "Meet the elite personal trainers of Gold's Gym Hurghada. Browse specialties, certifications and book your coach on the Red Sea.",
-    canonical: "https://goldsgymhurghada.com/trainers",
-    jsonLd: breadcrumbsLd([{ name: "Home", url: "https://goldsgymhurghada.com/" }, { name: "Trainers", url: "https://goldsgymhurghada.com/trainers" }]),
+    canonical: "/trainers",
+    jsonLd: breadcrumbsLd([{ name: "Home", url: absoluteUrl("/") }, { name: "Trainers", url: absoluteUrl("/trainers") }]),
   });
 
   const [trainers, setTrainers] = useState([]);
@@ -54,7 +54,7 @@ export default function Trainers() {
         <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search trainers…" className="w-full bg-white/[0.03] border border-white/10 pl-11 pr-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-gold focus:outline-none" />
+            <input aria-label="Search trainers" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search trainers…" className="w-full bg-white/[0.03] border border-white/10 pl-11 pr-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-gold focus:outline-none" />
           </div>
           <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
             {specializations.map((s) => (

@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { base44 } from "@/api/base44Client";
 import ContentState from "@/components/ContentState";
 import { isPublished } from "@/lib/content";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 
 export default function LegalPage({
   slug: slugProp,
@@ -30,11 +30,11 @@ export default function LegalPage({
   useSeo({
     title: page?.seo_title || page?.title || defaultTitle || (slug === "privacy" ? "Privacy Policy" : "Terms and Conditions"),
     description: page?.seo_description || defaultDescription || `Gold's Gym Hurghada ${slug === "privacy" ? "privacy policy" : "terms and conditions"}.`,
-    canonical: `https://goldsgymhurghada.com/${slug}`,
+    canonical: `/${slug}`,
     noindex: !page,
     jsonLd: breadcrumbsLd([
-      { name: "Home", url: "https://goldsgymhurghada.com/" },
-      { name: page?.title || slug, url: `https://goldsgymhurghada.com/${slug}` },
+      { name: "Home", url: absoluteUrl("/") },
+      { name: page?.title || slug, url: absoluteUrl(`/${slug}`) },
     ]),
   });
 

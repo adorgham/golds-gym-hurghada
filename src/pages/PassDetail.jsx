@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
@@ -29,12 +29,12 @@ export default function PassDetail() {
   useSeo({
     title: pass ? `${pass.name} — Gold's Gym Hurghada` : "Gym Pass",
     description: pass?.description || `Buy a ${pass?.name || "gym pass"} at Gold's Gym Hurghada.`,
-    canonical: `https://goldsgymhurghada.com/passes/${slug}`,
+    canonical: `/passes/${slug}`,
     noindex: !pass,
     jsonLd: breadcrumbsLd([
-      { name: "Home", url: "https://goldsgymhurghada.com/" },
-      { name: "Passes", url: "https://goldsgymhurghada.com/passes" },
-      { name: pass?.name || "Pass", url: `https://goldsgymhurghada.com/passes/${slug}` },
+      { name: "Home", url: absoluteUrl("/") },
+      { name: "Passes", url: absoluteUrl("/passes") },
+      { name: pass?.name || "Pass", url: absoluteUrl(`/passes/${slug}`) },
     ]),
   });
 

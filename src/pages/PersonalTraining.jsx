@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
@@ -21,8 +21,8 @@ export default function PersonalTraining() {
   useSeo({
     title: "Personal Training",
     description: "1-on-1 personal training at Gold's Gym Hurghada. Work with elite coaches to reach your strength, fat loss or bodybuilding goals faster.",
-    canonical: "https://goldsgymhurghada.com/personal-training",
-    jsonLd: breadcrumbsLd([{ name: "Home", url: "https://goldsgymhurghada.com/" }, { name: "Personal Training", url: "https://goldsgymhurghada.com/personal-training" }]),
+    canonical: "/personal-training",
+    jsonLd: breadcrumbsLd([{ name: "Home", url: absoluteUrl("/") }, { name: "Personal Training", url: absoluteUrl("/personal-training") }]),
   });
 
   const [trainers, setTrainers] = useState([]);

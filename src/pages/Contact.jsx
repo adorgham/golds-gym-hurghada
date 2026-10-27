@@ -1,4 +1,4 @@
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, PHONE, EMAIL, ADDRESS, OPENING_HOURS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
@@ -10,8 +10,8 @@ export default function Contact() {
   useSeo({
     title: "Contact",
     description: "Contact Gold's Gym Hurghada. Request a tour, callback, or membership info. Reach us by phone, WhatsApp or email.",
-    canonical: "https://goldsgymhurghada.com/contact",
-    jsonLd: breadcrumbsLd([{ name: "Home", url: "https://goldsgymhurghada.com/" }, { name: "Contact", url: "https://goldsgymhurghada.com/contact" }]),
+    canonical: "/contact",
+    jsonLd: breadcrumbsLd([{ name: "Home", url: absoluteUrl("/") }, { name: "Contact", url: absoluteUrl("/contact") }]),
   });
   const contactMethods = [
     PHONE && { icon: Phone, label: "Call Us", value: PHONE, href: `tel:${PHONE}`, event: EVENTS.phoneClick },
@@ -75,7 +75,7 @@ export default function Contact() {
 function LinkLike({ href, label, ext }) {
   return (
     <a href={href} target={ext ? "_blank" : undefined} rel={ext ? "noreferrer" : undefined}
-      onClick={() => track(EVENTS.leadSubmit, { lead_type: label.toLowerCase().includes("tour") ? "tour" : "callback", source: "contact_page" })}
+      onClick={() => track(EVENTS.whatsappClick, { location: "contact_page", intent: label.toLowerCase().includes("tour") ? "tour" : "callback" })}
       className="flex items-center justify-between border border-white/10 px-4 py-3 hover:border-gold hover:text-gold text-white/70 transition-all">
       <span className="flex items-center gap-2 font-heading text-sm"><WhatsAppIcon className="w-4 h-4 text-gold" /> {label}</span>
       <span>→</span>

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import SectionHeading from "@/components/SectionHeading";
 import ContentState from "@/components/ContentState";
+import { EVENTS, track } from "@/lib/site";
 import { CalendarDays, ChevronLeft, ChevronRight, Clock, SlidersHorizontal, User } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -40,8 +41,8 @@ export default function ClassSchedule() {
   useSeo({
     title: "Group Class Schedule",
     description: "View the current published weekly group-class schedule at Gold's Gym Hurghada, including times, trainers, studios and access information.",
-    canonical: "https://goldsgymhurghada.com/classes/schedule",
-    jsonLd: breadcrumbsLd([{ name: "Home", url: "https://goldsgymhurghada.com/" }, { name: "Classes", url: "https://goldsgymhurghada.com/classes/schedule" }]),
+    canonical: "/classes/schedule",
+    jsonLd: breadcrumbsLd([{ name: "Home", url: absoluteUrl("/") }, { name: "Classes", url: absoluteUrl("/classes/schedule") }]),
   });
 
   const [params, setParams] = useSearchParams();
@@ -99,6 +100,7 @@ export default function ClassSchedule() {
 
   const move = (direction) => {
     const amount = view === "week" ? 7 : 1;
+    track(EVENTS.scheduleWeekNavigate, { direction: direction < 0 ? "previous" : "next", view });
     updateParams({ date: addDays(anchorDate, direction * amount) });
   };
 
@@ -123,11 +125,12 @@ export default function ClassSchedule() {
           const matches = filterSchedule(resolved, { studio: nextStudio, access: nextAccess });
           const selectedHasMatch = matches.some((item) => item.occurrence_date === anchorDate);
           const nextAvailable = matches.find((item) => item.occurrence_date >= anchorDate)?.occurrence_date || matches[0]?.occurrence_date || anchorDate;
+          track(EVENTS.scheduleFilterApply, { studio: nextStudio, access: nextAccess, source: "mobile" });
           updateParams({ studio: nextStudio, access: nextAccess, date: selectedHasMatch ? anchorDate : nextAvailable });
         }}
-        onChooseDate={(date) => { updateParams({ date }); setMobileFullWeek(false); }}
-        onMoveWeek={(direction) => updateParams({ date: addDays(anchorDate, direction * 7) })}
-        onToggleFullWeek={() => setMobileFullWeek((value) => !value)}
+        onChooseDate={(date) => { track(EVENTS.scheduleDateSelect, { date, source: "mobile_strip" }); updateParams({ date }); setMobileFullWeek(false); }}
+        onMoveWeek={(direction) => { track(EVENTS.scheduleWeekNavigate, { direction: direction < 0 ? "previous" : "next", view: "mobile_day" }); updateParams({ date: addDays(anchorDate, direction * 7) }); }}
+        onToggleFullWeek={() => setMobileFullWeek((value) => { track(EVENTS.scheduleViewChange, { view: value ? "mobile_day" : "mobile_week" }); return !value; })}
         sessions={filtered}
         studio={studio}
         today={today}
@@ -138,20 +141,20 @@ export default function ClassSchedule() {
           <div className="grid min-w-0 gap-5 lg:grid-cols-[auto_1fr_1fr_auto] lg:items-end lg:gap-6">
             <FilterGroup label="View">
               {[{ value: "week", label: "Week" }, { value: "day", label: "Day" }].map((item) => (
-                <FilterButton key={item.value} active={view === item.value} onClick={() => updateParams({ view: item.value })}>{item.label}</FilterButton>
+                <FilterButton key={item.value} active={view === item.value} onClick={() => { track(EVENTS.scheduleViewChange, { view: item.value }); updateParams({ view: item.value }); }}>{item.label}</FilterButton>
               ))}
             </FilterGroup>
           <FilterGroup label="Studio (Location)">
-            <FilterButton active={studio === "all"} onClick={() => updateParams({ studio: "all" })}>All</FilterButton>
-            {STUDIOS.map((item) => <FilterButton key={item.value} active={studio === item.value} tone={STUDIO_TONES[item.value]} onClick={() => updateParams({ studio: item.value })}>{item.shortLabel}</FilterButton>)}
+            <FilterButton active={studio === "all"} onClick={() => { track(EVENTS.scheduleFilterApply, { studio: "all", access }); updateParams({ studio: "all" }); }}>All</FilterButton>
+            {STUDIOS.map((item) => <FilterButton key={item.value} active={studio === item.value} tone={STUDIO_TONES[item.value]} onClick={() => { track(EVENTS.scheduleFilterApply, { studio: item.value, access }); updateParams({ studio: item.value }); }}>{item.shortLabel}</FilterButton>)}
           </FilterGroup>
 
           <FilterGroup label="Members & Access">
-            {ACCESS_TYPES.map((item) => <FilterButton key={item.value} active={access === item.value} tone={item.value === "all" ? null : { border: ACCESS_TONES[item.value].split(" ")[0], text: ACCESS_TONES[item.value].split(" ")[2] }} onClick={() => updateParams({ access: item.value })}>{item.label}</FilterButton>)}
+            {ACCESS_TYPES.map((item) => <FilterButton key={item.value} active={access === item.value} tone={item.value === "all" ? null : { border: ACCESS_TONES[item.value].split(" ")[0], text: ACCESS_TONES[item.value].split(" ")[2] }} onClick={() => { track(EVENTS.scheduleFilterApply, { studio, access: item.value }); updateParams({ access: item.value }); }}>{item.label}</FilterButton>)}
           </FilterGroup>
             <div className="flex items-center gap-2 lg:justify-end">
               <button type="button" onClick={() => move(-1)} aria-label={`Previous ${view}`} className="border border-white/10 p-2.5 text-white/60 hover:border-gold hover:text-gold"><ChevronLeft className="h-4 w-4" /></button>
-              <button type="button" onClick={() => updateParams({ date: today })} className="border border-white/10 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-white/70 hover:border-gold hover:text-gold">Today</button>
+              <button type="button" onClick={() => { track(EVENTS.scheduleDateSelect, { date: today, source: "today" }); updateParams({ date: today }); }} className="border border-white/10 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-white/70 hover:border-gold hover:text-gold">Today</button>
               <button type="button" onClick={() => move(1)} aria-label={`Next ${view}`} className="border border-white/10 p-2.5 text-white/60 hover:border-gold hover:text-gold"><ChevronRight className="h-4 w-4" /></button>
             </div>
           </div>

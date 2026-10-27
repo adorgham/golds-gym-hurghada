@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { getAttribution } from "@/lib/attribution";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import Reveal from "@/components/Reveal";
 import { ArrowRight, Check, Award, Globe, Clock, Instagram, Loader2, Calendar } from "lucide-react";
@@ -40,20 +40,19 @@ export default function TrainerDetail() {
       .catch(() => setFailed(true))
       .finally(() => setLoading(false));
     track(EVENTS.trainerView, { trainer: slug, location: "trainer_detail" });
-    track(EVENTS.trainerBookingStart, { trainer: slug });
   }, [slug]);
 
   const t = trainer || {};
   useSeo({
     title: t.name ? `${t.name} — Personal Trainer` : "Personal Trainer",
     description: t.bio || `Book a personal training session with ${t.name} at Gold's Gym Hurghada.`,
-    canonical: `https://goldsgymhurghada.com/trainers/${slug}`,
+    canonical: `/trainers/${slug}`,
     noindex: !trainer,
     jsonLd: [
       breadcrumbsLd([
-        { name: "Home", url: "https://goldsgymhurghada.com/" },
-        { name: "Trainers", url: "https://goldsgymhurghada.com/trainers" },
-        { name: t.name || "Trainer", url: `https://goldsgymhurghada.com/trainers/${slug}` },
+        { name: "Home", url: absoluteUrl("/") },
+        { name: "Trainers", url: absoluteUrl("/trainers") },
+        { name: t.name || "Trainer", url: absoluteUrl(`/trainers/${slug}`) },
       ]),
       { "@context": "https://schema.org", "@type": "Person", name: t.name, jobTitle: t.title, worksFor: { "@type": "HealthClub", name: "Gold's Gym Hurghada" } },
     ],
@@ -116,7 +115,7 @@ export default function TrainerDetail() {
             </div>
             <p className="text-white/60 text-lg mt-6 max-w-lg">{t.bio}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#book" className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-7 py-4 hover:brightness-110 transition-all clip-tag">
+              <a href="#book" onClick={() => track(EVENTS.trainerBookingStart, { trainer: slug, location: "trainer_hero" })} className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading tracking-wide px-7 py-4 hover:brightness-110 transition-all clip-tag">
                 BOOK PERSONAL TRAINING <ArrowRight className="w-4 h-4" />
               </a>
               {HAS_WHATSAPP && <a href={whatsappUrl(`Hi, I'd like to ask about training with ${t.name}.`)} target="_blank" rel="noreferrer"
@@ -210,16 +209,16 @@ export default function TrainerDetail() {
                       <input id="booking-website" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <input required type="date" value={booking.preferred_date} onChange={(e) => setBooking((b) => ({ ...b, preferred_date: e.target.value }))} className={field} />
-                      <input required type="time" value={booking.preferred_time} onChange={(e) => setBooking((b) => ({ ...b, preferred_time: e.target.value }))} className={field} />
+                      <input aria-label="Preferred date" required type="date" value={booking.preferred_date} onChange={(e) => setBooking((b) => ({ ...b, preferred_date: e.target.value }))} className={field} />
+                      <input aria-label="Preferred time" required type="time" value={booking.preferred_time} onChange={(e) => setBooking((b) => ({ ...b, preferred_time: e.target.value }))} className={field} />
                     </div>
-                    <input placeholder="Training goal (e.g. fat loss, strength)" value={booking.training_goal} onChange={(e) => setBooking((b) => ({ ...b, training_goal: e.target.value }))} className={field} />
-                    <input required placeholder="Your name" value={booking.name} onChange={(e) => setBooking((b) => ({ ...b, name: e.target.value }))} className={field} />
+                    <input aria-label="Training goal" placeholder="Training goal (e.g. fat loss, strength)" value={booking.training_goal} onChange={(e) => setBooking((b) => ({ ...b, training_goal: e.target.value }))} className={field} />
+                    <input aria-label="Your name" autoComplete="name" required placeholder="Your name" value={booking.name} onChange={(e) => setBooking((b) => ({ ...b, name: e.target.value }))} className={field} />
                     <div className="grid grid-cols-2 gap-3">
-                      <input required type="tel" placeholder="Phone" value={booking.phone} onChange={(e) => setBooking((b) => ({ ...b, phone: e.target.value }))} className={field} />
-                      <input type="tel" placeholder="WhatsApp" value={booking.whatsapp} onChange={(e) => setBooking((b) => ({ ...b, whatsapp: e.target.value }))} className={field} />
+                      <input aria-label="Phone" autoComplete="tel" required type="tel" placeholder="Phone" value={booking.phone} onChange={(e) => setBooking((b) => ({ ...b, phone: e.target.value }))} className={field} />
+                      <input aria-label="WhatsApp number" autoComplete="tel" type="tel" placeholder="WhatsApp" value={booking.whatsapp} onChange={(e) => setBooking((b) => ({ ...b, whatsapp: e.target.value }))} className={field} />
                     </div>
-                    <input type="email" placeholder="Email" value={booking.email} onChange={(e) => setBooking((b) => ({ ...b, email: e.target.value }))} className={field} />
+                    <input aria-label="Email" autoComplete="email" type="email" placeholder="Email" value={booking.email} onChange={(e) => setBooking((b) => ({ ...b, email: e.target.value }))} className={field} />
                     <label className="flex items-center gap-2 text-sm text-white/60 cursor-pointer">
                       <input type="checkbox" checked={booking.is_member} onChange={(e) => setBooking((b) => ({ ...b, is_member: e.target.checked }))} className="accent-[#D4AF37]" />
                       I'm an existing member

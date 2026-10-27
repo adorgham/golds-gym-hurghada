@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import { ArrowRight } from "lucide-react";
@@ -40,8 +40,8 @@ export default function ArticleList({ section: sectionProp }) {
   useSeo({
     title: meta.title,
     description: meta.desc,
-    canonical: `https://goldsgymhurghada.com/${section}`,
-    jsonLd: breadcrumbsLd([{ name: "Home", url: "https://goldsgymhurghada.com/" }, { name: meta.title, url: `https://goldsgymhurghada.com/${section}` }]),
+    canonical: `/${section}`,
+    jsonLd: breadcrumbsLd([{ name: "Home", url: absoluteUrl("/") }, { name: meta.title, url: absoluteUrl(`/${section}`) }]),
   });
 
   return (

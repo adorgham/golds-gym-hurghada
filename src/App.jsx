@@ -1,35 +1,35 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
-import Home from '@/pages/Home';
-import Memberships from '@/pages/Memberships';
-import Passes from '@/pages/Passes';
-import PassDetail from '@/pages/PassDetail';
-import Trainers from '@/pages/Trainers';
-import TrainerDetail from '@/pages/TrainerDetail';
-import ClassSchedule from '@/pages/ClassSchedule';
-import PersonalTraining from '@/pages/PersonalTraining';
-import Facilities from '@/pages/Facilities';
-import About from '@/pages/About';
-import Contact from '@/pages/Contact';
-import ArticleList from '@/pages/ArticleList';
-import ArticleDetail from '@/pages/ArticleDetail';
-import Admin from '@/pages/Admin';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
-import ForgotPassword from '@/pages/ForgotPassword';
-import ResetPassword from '@/pages/ResetPassword';
-import LegalPage from '@/pages/LegalPage';
 import { captureAttribution } from '@/lib/attribution';
-// Add page imports here
+
+const PageNotFound = lazy(() => import('./lib/PageNotFound'));
+const Home = lazy(() => import('@/pages/Home'));
+const Memberships = lazy(() => import('@/pages/Memberships'));
+const Passes = lazy(() => import('@/pages/Passes'));
+const PassDetail = lazy(() => import('@/pages/PassDetail'));
+const Trainers = lazy(() => import('@/pages/Trainers'));
+const TrainerDetail = lazy(() => import('@/pages/TrainerDetail'));
+const ClassSchedule = lazy(() => import('@/pages/ClassSchedule'));
+const PersonalTraining = lazy(() => import('@/pages/PersonalTraining'));
+const Facilities = lazy(() => import('@/pages/Facilities'));
+const About = lazy(() => import('@/pages/About'));
+const Contact = lazy(() => import('@/pages/Contact'));
+const ArticleList = lazy(() => import('@/pages/ArticleList'));
+const ArticleDetail = lazy(() => import('@/pages/ArticleDetail'));
+const Admin = lazy(() => import('@/pages/Admin'));
+const Login = lazy(() => import('@/pages/Login'));
+const Register = lazy(() => import('@/pages/Register'));
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
+const LegalPage = lazy(() => import('@/pages/LegalPage'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -56,7 +56,7 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <Routes>
+    <Suspense fallback={<div className="grid min-h-screen place-items-center bg-obsidian text-sm text-white/45">Loading…</div>}><Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -88,7 +88,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin" element={<Admin />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
-    </Routes>
+    </Routes></Suspense>
   );
 };
 

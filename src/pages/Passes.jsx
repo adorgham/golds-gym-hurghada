@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Reveal from "@/components/Reveal";
@@ -14,8 +14,8 @@ export default function Passes() {
   useSeo({
     title: "Gym Passes — Day, 3, 5 & 7 Day Passes",
     description: "Short-term gym passes for Hurghada visitors, tourists and business travelers. Day pass, 3-day, 5-day and 7-day access to Gold's Gym Hurghada.",
-    canonical: "https://goldsgymhurghada.com/passes",
-    jsonLd: breadcrumbsLd([{ name: "Home", url: "https://goldsgymhurghada.com/" }, { name: "Passes", url: "https://goldsgymhurghada.com/passes" }]),
+    canonical: "/passes",
+    jsonLd: breadcrumbsLd([{ name: "Home", url: absoluteUrl("/") }, { name: "Passes", url: absoluteUrl("/passes") }]),
   });
 
   const [passes, setPasses] = useState([]);

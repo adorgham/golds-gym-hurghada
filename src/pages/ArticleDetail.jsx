@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useSeo, breadcrumbsLd } from "@/lib/seo";
+import { absoluteUrl, useSeo, breadcrumbsLd } from "@/lib/seo";
 import Reveal from "@/components/Reveal";
 import { ArrowRight, Clock, Dumbbell, Target } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -28,13 +28,13 @@ export default function ArticleDetail({ section: sectionProp }) {
   useSeo({
     title: a.title || "Article not found",
     description: a.excerpt || a.title,
-    canonical: `https://goldsgymhurghada.com/${section}/${slug}`,
+    canonical: `/${section}/${slug}`,
     noindex: !article,
     jsonLd: [
       breadcrumbsLd([
-        { name: "Home", url: "https://goldsgymhurghada.com/" },
-        { name: section, url: `https://goldsgymhurghada.com/${section}` },
-        { name: a.title || "Article", url: `https://goldsgymhurghada.com/${section}/${slug}` },
+        { name: "Home", url: absoluteUrl("/") },
+        { name: section, url: absoluteUrl(`/${section}`) },
+        { name: a.title || "Article", url: absoluteUrl(`/${section}/${slug}`) },
       ]),
       { "@context": "https://schema.org", "@type": "BlogPosting", headline: a.title, author: { "@type": "Person", name: a.author_name }, datePublished: a.published_date },
     ],

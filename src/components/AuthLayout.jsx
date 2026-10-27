@@ -1,6 +1,9 @@
 import React from "react";
+import { useSeo } from "@/lib/seo";
 
 export default function AuthLayout({ icon: Icon, title, subtitle = "", footer = null, children = null }) {
+  useSeo({ title, description: subtitle || "Gold's Gym Hurghada account access.", noindex: true });
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">

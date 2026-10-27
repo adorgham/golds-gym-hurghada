@@ -80,15 +80,15 @@ export default function LeadForm({
       {title && <h3 className="font-heading text-2xl text-white">{title}</h3>}
       {subtitle && <p className="text-white/55 text-sm">{subtitle}</p>}
       <div className="grid sm:grid-cols-2 gap-3">
-        <input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Full name" className={fieldCls} />
-        <input type="tel" required value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="Phone" className={fieldCls} />
+        <input aria-label="Full name" autoComplete="name" required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Full name" className={fieldCls} />
+        <input aria-label="Phone" autoComplete="tel" type="tel" required value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="Phone" className={fieldCls} />
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
-        <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="Email" className={fieldCls} />
-        <input type="tel" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="WhatsApp number" className={fieldCls} />
+        <input aria-label="Email" autoComplete="email" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="Email" className={fieldCls} />
+        <input aria-label="WhatsApp number" autoComplete="tel" type="tel" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="WhatsApp number" className={fieldCls} />
       </div>
-      <textarea rows={variant === "compact" ? 2 : 3} value={form.message} onChange={(e) => set("message", e.target.value)} placeholder="Message (optional)" className={fieldCls} />
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      <textarea aria-label="Message" rows={variant === "compact" ? 2 : 3} value={form.message} onChange={(e) => set("message", e.target.value)} placeholder="Message (optional)" className={fieldCls} />
+      {error && <p role="alert" className="text-red-400 text-sm">{error}</p>}
       <button
         type="submit"
         disabled={loading}

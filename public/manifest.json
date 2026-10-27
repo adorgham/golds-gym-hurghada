@@ -1,0 +1,17 @@
+{
+  "name": "Gold's Gym Hurghada",
+  "short_name": "Gold's Gym",
+  "description": "Gold's Gym Hurghada — The Mecca of Fitness on the Red Sea.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "icons": [
+    {
+      "src": "/golds-gym-favicon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

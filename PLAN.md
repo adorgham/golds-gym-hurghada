@@ -1,6 +1,6 @@
 # Gold's Gym Hurghada — Delivery Plan to GTM
 
-**Status:** Sprint 3 implemented locally; remote migration review, approved schedule data and staging UAT pending
+**Status:** Sprint 3 synchronized and populated; Sprint 4 implementation in progress; staff schedule-mutation UAT and final production cutover remain pending
 
 **Planning basis:** repository audit completed 2026-10-26
 
@@ -111,11 +111,11 @@ Local results on 2026-10-26: lint, typecheck, Vite production build and Base44 p
 
 | Item | Classification | Status |
 | --- | --- | --- |
-| Preserve `ClassSession` as the canonical recurring weekly rule | DEPENDENCY NOW | Implemented locally; remote migration review pending |
+| Preserve `ClassSession` as the canonical recurring weekly rule | DEPENDENCY NOW | Synchronized to the shared Base44 backend |
 | Resolve recurring rules, date-specific overrides and one-off sessions in `Africa/Cairo` | REQUIRED NOW | Implemented locally |
 | Add independent Studio and Members/Access filters with URL state | REQUIRED NOW | Implemented locally |
-| Provide responsive public week/day views with cancellations and amendments labelled | REQUIRED NOW | Implemented locally; populated browser UAT pending |
-| Add class catalogue and low-friction schedule administration | REQUIRED NOW | Implemented locally; staff UAT pending |
+| Provide responsive public week/day views with cancellations and amendments labelled | REQUIRED NOW | Populated desktop/mobile UAT passed |
+| Add class catalogue and low-friction schedule administration | REQUIRED NOW | Implemented; staff mutation UAT pending |
 | Support “this occurrence” and versioned “this and future” changes | REQUIRED NOW | Implemented locally |
 | Preserve stable dated occurrence keys for future consumers | DEPENDENCY NOW | Implemented locally |
 | Capacity consumption, booking, waitlists, attendance and notifications | FUTURE-READY ONLY | Deferred |
@@ -151,11 +151,29 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 
 ## Sprint 4 — SEO, analytics and quality hardening
 
+**Status:** In progress. The owner confirmed `https://www.goldsgymhurgahda.co` as the future canonical production domain on 2026-10-27. Indexing remains disabled until the controlled Sprint 6 cutover.
+
 ### Scope
 
 - `REQUIRED NOW`: metadata, canonicals, structured data, sitemap, robots rules, internal links, analytics event contract and campaign attribution verification.
 - `REQUIRED NOW`: performance, accessibility, security and cross-browser remediation.
 - `DEPENDENCY NOW`: validate Base44 SPA rendering with Google/search tooling; introduce prerendering only if evidence shows the current rendering path is insufficient.
+
+### Implemented in the current Sprint 4 pass
+
+- Centralized canonical URLs and structured-data URLs on the confirmed `.co` domain.
+- Kept site-wide indexing controlled by `VITE_PUBLIC_ALLOW_INDEXING`; build output now generates matching robots rules, index HTML directives and a static sitemap.
+- Prevented stale canonical and structured-data tags from leaking between SPA routes; auth, admin, missing-content and 404 routes remain `noindex`.
+- Added schedule interaction events and corrected WhatsApp/PT events that previously overstated submissions or booking starts.
+- Added reduced-motion support, accessible public-form labels and a valid web manifest.
+- Dynamic trainer, pass and article sitemap entries remain a Sprint 5 content-freeze task because their approved production slugs are not yet frozen.
+
+### Remaining Sprint 4 exit gates
+
+- Confirm whether Base44 analytics is the GTM system of record or provide the approved GA4/GTM measurement ID and consent requirements.
+- Confirm Base44's native anonymous-function abuse limits or approve an additional rate-limit control for the public lead functions.
+- Run Google/Search Console or equivalent rendered-crawl validation once an accessible staging or production-domain deployment exists; Base44 hosting serves a client-rendered SPA, so source HTML alone does not prove rendered indexability.
+- Complete representative keyboard, screen-reader and cross-browser UAT on the release candidate.
 
 ### Acceptance criteria
 
@@ -195,7 +213,7 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 
 ## Decision points requiring owner approval
 
-1. Confirm the canonical production domain: `www.goldsgymhurgahda.co` in `PROJECT.md` conflicts with `goldsgymhurghada.com` in the current code.
+1. **Resolved 2026-10-27:** the future canonical production domain is `www.goldsgymhurgahda.co`; indexing remains disabled until domain cutover.
 2. Confirm official phone, WhatsApp number, email, address, opening hours and map location; current values are placeholders.
 3. Confirm whether launch includes enquiry-only memberships/passes or online payment and fulfillment. Recommendation: enquiry-only for GTM unless a payment provider, policies and operational owner are already confirmed.
 4. Confirm whether PT is an enquiry/request or a real-time booking commitment. Recommendation: keep it as a request for launch.
