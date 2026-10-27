@@ -86,8 +86,7 @@
   },
   "required": [
     "name",
-    "slug",
-    "title"
+    "slug"
   ],
   "rls": {
     "create": {

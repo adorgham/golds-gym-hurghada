@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { filterSchedule, isValidDateKey, normalizeTrainerName, resolveSchedule, startOfWeek } from "../src/lib/schedule.js";
+import { BASELINE_EFFECTIVE_DATE, CLASS_NAMES, SCHEDULE_ROWS, TRAINER_NAMES } from "./migrate-october-2026-schedule.mjs";
 
 const recurring = [
   { id: "r1", class_id: "c1", class_name: "Spinning", trainer_id: "t1", day_of_week: "Wednesday", start_time: "19:00", duration_minutes: 45, studio: "spinning", access_types: ["ladies_only", "prepaid"], active_from: "2026-10-01", is_published: true },
@@ -47,5 +48,32 @@ const publicIgnoresDraftOverride = resolveSchedule({
   toDate: "2026-10-21",
 });
 assert.equal(publicIgnoresDraftOverride[0]?.start_time, "19:00");
+
+assert.equal(SCHEDULE_ROWS.length, 51);
+assert.equal(CLASS_NAMES.length, 27);
+assert.equal(TRAINER_NAMES.length, 13);
+assert.equal(new Set(SCHEDULE_ROWS.map((row) => row.source_key)).size, 51);
+assert.equal(SCHEDULE_ROWS.some((row) => row.day_of_week === "Friday"), false);
+assert.equal(SCHEDULE_ROWS.some((row) => Object.hasOwn(row, "duration_minutes")), false);
+assert.equal(SCHEDULE_ROWS.filter((row) => row.trainer_name == null).length, 10);
+assert.equal(SCHEDULE_ROWS.filter((row) => row.age_min != null).length, 8);
+
+const baseline = SCHEDULE_ROWS.map((row, index) => ({
+  ...row,
+  id: `baseline-${index}`,
+  active_from: BASELINE_EFFECTIVE_DATE,
+  is_published: true,
+}));
+const octoberWeek = resolveSchedule({ recurring: baseline, fromDate: "2026-10-05", toDate: "2026-10-11" });
+const futureWeek = resolveSchedule({ recurring: baseline, fromDate: "2027-01-04", toDate: "2027-01-10" });
+assert.equal(octoberWeek.length, 51);
+assert.equal(futureWeek.length, 51);
+assert.equal(octoberWeek.filter((item) => item.day_of_week === "Friday").length, 0);
+assert.equal(filterSchedule(octoberWeek, { studio: "martial_arts", access: "kids" }).length, 8);
+assert.equal(filterSchedule(octoberWeek, { studio: "floor", access: "all" }).length, 2);
+assert.deepEqual(
+  octoberWeek.find((item) => item.class_name === "Kids Kick Boxing" && item.age_min === 9)?.access_types,
+  ["prepaid", "kids"],
+);
 
 console.log("Schedule resolver validation passed.");

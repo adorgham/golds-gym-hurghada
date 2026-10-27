@@ -18,7 +18,7 @@ export const ACCESS_TYPES = [
 const LEGACY_STUDIO_MAP = new Map([
   ["aerobics", "aerobics"], ["aerobics studio", "aerobics"],
   ["spinning", "spinning"], ["spinning studio", "spinning"],
-  ["martial arts", "martial_arts"], ["martial arts studio", "martial_arts"],
+  ["martial_arts", "martial_arts"], ["martial arts", "martial_arts"], ["martial arts studio", "martial_arts"],
   ["floor", "floor"], ["gym floor", "floor"], ["main floor", "floor"],
 ]);
 
@@ -139,6 +139,8 @@ export function resolveSchedule({
       const originalTrainer = trainerMap.get(base.trainer_id);
       const replacementTrainer = trainerMap.get(override?.replacement_trainer_id);
       const hasReplacementAccess = override && Object.prototype.hasOwnProperty.call(override, "replacement_access_types");
+      const hasReplacementAgeMin = override && Object.prototype.hasOwnProperty.call(override, "replacement_age_min");
+      const hasReplacementAgeMax = override && Object.prototype.hasOwnProperty.call(override, "replacement_age_max");
       const trainerRemoved = override?.remove_trainer === true;
 
       resolved.push({
@@ -158,6 +160,8 @@ export function resolveSchedule({
         difficulty: base.difficulty || classRecord?.difficulty || "",
         studio: normalizeStudio(override?.replacement_studio || base.studio || base.room || classRecord?.default_studio),
         access_types: normalizeAccessTypes(hasReplacementAccess ? override.replacement_access_types : (base.access_types || classRecord?.default_access_types)),
+        age_min: hasReplacementAgeMin ? override.replacement_age_min : base.age_min,
+        age_max: hasReplacementAgeMax ? override.replacement_age_max : base.age_max,
         is_cancelled: override?.change_type === "Cancel",
         is_modified: override?.change_type === "Modify",
         is_published: base.is_published !== false && (!override || override.is_published !== false),
@@ -189,6 +193,8 @@ export function resolveSchedule({
       difficulty: session.difficulty || classRecord?.difficulty || "",
       studio: normalizeStudio(session.studio || classRecord?.default_studio),
       access_types: normalizeAccessTypes(session.access_types || classRecord?.default_access_types),
+      age_min: session.age_min,
+      age_max: session.age_max,
       is_cancelled: session.status === "Cancelled",
       is_modified: false,
       is_published: session.is_published !== false,

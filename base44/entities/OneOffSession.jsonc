@@ -21,6 +21,8 @@
         "enum": ["all", "prepaid", "ladies_only", "kids"]
       }
     },
+    "age_min": { "type": "number" },
+    "age_max": { "type": "number" },
     "status": {
       "type": "string",
       "enum": ["Scheduled", "Cancelled"],
@@ -29,7 +31,7 @@
     "notes": { "type": "string" },
     "is_published": { "type": "boolean", "default": false }
   },
-  "required": ["class_name", "session_date", "start_time", "duration_minutes", "studio"],
+  "required": ["class_name", "session_date", "start_time", "studio"],
   "rls": {
     "create": { "user_condition": { "role": "admin" } },
     "read": true,

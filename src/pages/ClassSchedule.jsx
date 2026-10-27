@@ -211,10 +211,11 @@ function SessionCard({ session, compact = false }) {
       <h3 className={`mt-1 font-heading ${compact ? "text-sm" : "text-lg"} leading-tight text-white ${session.is_cancelled ? "line-through opacity-60" : ""}`}>{session.class_name}</h3>
       <div className="mt-2 space-y-1 text-[10px] text-white/55">
         <div className="flex items-center gap-1"><User className="h-3 w-3" /> {session.trainer_slug ? <Link to={`/trainers/${session.trainer_slug}`} className="hover:text-gold">{session.trainer_name}</Link> : session.trainer_name || "Trainer TBA"}</div>
-        <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {session.duration_minutes ? `${session.duration_minutes} min` : "Duration TBA"}{session.difficulty ? ` · ${session.difficulty}` : ""}</div>
+        {(session.duration_minutes || session.difficulty) && <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {session.duration_minutes ? `${session.duration_minutes} min` : session.difficulty}{session.duration_minutes && session.difficulty ? ` · ${session.difficulty}` : ""}</div>}
         <div className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {studioLabel(session.studio)}</div>
       </div>
       {badges.length > 0 && <div className="mt-2 flex flex-wrap gap-1">{badges.map((item) => <span key={item} className="bg-gold px-1.5 py-0.5 text-[9px] font-bold uppercase text-obsidian">{accessLabel(item)}</span>)}</div>}
+      {(session.age_min != null || session.age_max != null) && <p className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-white/65">Ages {session.age_min ?? "…"}–{session.age_max ?? "…"}</p>}
       {session.notes && <p className="mt-2 text-[10px] text-white/45">{session.notes}</p>}
     </article>
   );

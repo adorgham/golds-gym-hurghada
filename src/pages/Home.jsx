@@ -115,7 +115,7 @@ export default function Home() {
       </section>
 
       {/* QUICK MEMBERSHIP SELECTOR */}
-      <section className="relative -mt-10 z-10 px-5 lg:px-10">
+      <section className="relative px-5 pt-10 lg:px-10 lg:pt-12">
         <Reveal className="max-w-[1400px] mx-auto">
           <div className="glass border border-white/10 shadow-box p-6 lg:p-8">
             <div className="flex items-center justify-between mb-5 flex-wrap gap-2">

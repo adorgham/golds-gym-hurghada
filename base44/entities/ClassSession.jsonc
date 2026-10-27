@@ -59,6 +59,15 @@
         "enum": ["all", "prepaid", "ladies_only", "kids"]
       }
     },
+    "age_min": {
+      "type": "number"
+    },
+    "age_max": {
+      "type": "number"
+    },
+    "source_key": {
+      "type": "string"
+    },
     "active_from": {
       "type": "string",
       "format": "date"
