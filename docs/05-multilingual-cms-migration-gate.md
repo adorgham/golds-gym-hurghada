@@ -1,6 +1,7 @@
 # Multilingual CMS production migration gate
 
 **Audit date:** 2026-10-29
+**Synchronization date:** 2026-10-29
 
 ## Outcome
 
@@ -28,14 +29,29 @@ Base44 entity synchronization replaces the complete remote schema set. A standar
 
 Both `member` and `Member` contained zero records at audit time. The lowercase schema removal remains an explicit approval checkpoint because it is unrelated to multilingual content.
 
-## Required approval
+## Synchronization result
 
-Before schema synchronization, the owner must explicitly approve updating `SitePage` and removing the empty lowercase `member` duplicate. After approval, the release operator must:
+The owner approved the `SitePage` synchronization and removal of the empty lowercase `member` duplicate. The standard Base44 entity synchronization completed successfully.
 
-1. synchronize the entity schemas through the standard Base44 CLI workflow;
-2. re-fetch the production schema set and confirm 15 schemas remain;
-3. confirm the `SitePage` fields and published-only public read rule;
-4. verify that all existing non-`SitePage` record counts remain unchanged;
-5. import approved language editions as unpublished records.
+- Production now contains exactly 15 entity schemas.
+- All 15 production schemas exactly match the repository definitions.
+- The lowercase `member` entity key is absent.
+- The canonical uppercase `Member` entity and its production record remain present.
+- The related `MembershipTerm` record remains present.
+- All other retained entity record counts are unchanged.
+- `SitePage` still contains zero records and is ready for the approved unpublished-edition import.
+
+## Content import preflight
+
+The source workbook was validated on 2026-10-30 without writing to Base44. The dry-run manifest contains 20 unique records covering five page identities in EN, AR, DE and RU.
+
+- All records are explicitly `draft` and `is_published=false`.
+- Repository route identities override the workbook's unprefixed validation paths for localized editions.
+- Canonical membership, pass, trainer and schedule blocks reference shared entities instead of copying commercial or operational values into `SitePage`.
+- The manifest contains no hard placeholder markers or embedded currency/price claims.
+- Sixteen non-home primary CTA destinations remain intentionally blank pending approval.
+- All editions still require management approval; AR, DE and RU also require native-language editorial approval.
+
+The next migration step is a separately authorized creation of the 20 records as unpublished drafts. Publication remains a later, selective approval checkpoint.
 
 Raw production exports and exact schema snapshots remain in the ignored migration work folder and must not be committed.

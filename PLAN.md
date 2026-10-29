@@ -166,7 +166,7 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 
 ### Multilingual Step 2 — CMS foundation
 
-**Status:** Implemented locally; the read-only production inventory and schema diff gate passed on 2026-10-29. Synchronization awaits explicit approval because the full-sync operation will remove an empty legacy lowercase `member` schema duplicate.
+**Status:** Synchronized to production on 2026-10-29 after the read-only inventory and owner approval. The empty legacy lowercase `member` schema duplicate was removed. The XLSX-to-`SitePage` dry-run manifest passed on 2026-10-30; draft creation, editorial approval, publication and populated UAT remain pending.
 
 - `SitePage` remains the single CMS entity and now supports one independent record per deterministic `page_key + locale` edition.
 - Ordered edition blocks support editorial sections, FAQs, CTAs and references to canonical offers, trainers and schedules without copying authoritative commercial data.
@@ -175,12 +175,13 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 - Duplicate page/locale editions are rejected by the admin. Import reconciliation uses the deterministic `edition_key`; the remote backend does not yet enforce a database uniqueness constraint.
 - Draft/review editions are intended for administrators only. The local schema changes `SitePage` public read access to published records while retaining administrator access to all editions.
 - Before schema synchronization, inventory/export any remote `SitePage` records and explicitly set `is_published` on approved legacy records. Records with an unset publication flag will no longer be anonymously readable after this RLS change.
-- The production audit found zero `SitePage` records, so no legacy page records require publication-state migration. Fourteen local schemas match production exactly; `SitePage` is the only intended change. Production also contains empty `member` and `Member` schema keys, and standard synchronization is expected to remove the lowercase duplicate.
+- The production audit found zero `SitePage` records, so no legacy page records required publication-state migration. Synchronization updated `SitePage`, removed the confirmed-empty lowercase `member` duplicate and preserved the canonical `Member` entity and its records. The post-sync audit confirms all 15 production schemas exactly match the repository.
+- The 2026-10-30 workbook preflight produced 20 unique EN/AR/DE/RU payloads with zero validation errors. Every payload remains `draft` and unpublished; canonical offer, trainer and schedule blocks do not copy commercial or operational records. Sixteen non-home primary CTA destinations and all management/native-language approvals remain publication blockers.
 - Content import, localized public routes and production publication remain excluded from Step 2.
 
 ### Multilingual Step 3 — localized website runtime
 
-**Status:** Implemented locally; populated UAT remains blocked on the Step 2 Base44 schema gate and approved published editions.
+**Status:** Implemented locally; the Base44 schema gate and content dry run have passed. Populated UAT remains blocked on creation and approval of unpublished editions, followed by selective publication.
 
 - Added route families for the five agreed page identities under `/ar`, `/de` and `/ru`; `/en/*` redirects to the existing unprefixed English route.
 - Existing English pages and presentation remain unchanged.
