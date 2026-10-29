@@ -10,8 +10,10 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
     "test:schedule": "node scripts/validate-schedule.mjs",
+    "test:localization": "node scripts/validate-localization-foundation.mjs",
+    "test:editions": "node scripts/validate-page-editions.mjs",
     "test:seo": "node scripts/validate-seo-assets.mjs",
-    "check": "npm run lint && npm run typecheck && npm run test:schedule && npm run build && npm run test:seo",
+    "check": "npm run lint && npm run typecheck && npm run test:schedule && npm run test:localization && npm run test:editions && npm run build && npm run test:seo",
     "preview": "vite preview"
   },
   "dependencies": {

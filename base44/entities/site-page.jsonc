@@ -2,17 +2,80 @@
   "name": "SitePage",
   "type": "object",
   "properties": {
+    "edition_key": {
+      "type": "string",
+      "description": "Deterministic page_key:locale import and reconciliation key"
+    },
+    "page_key": {
+      "type": "string",
+      "enum": ["home", "memberships", "passes", "personal_training", "class_schedule"],
+      "description": "Stable identity shared by independent language editions"
+    },
+    "locale": {
+      "type": "string",
+      "enum": ["en", "ar", "de", "ru"],
+      "default": "en"
+    },
+    "direction": {
+      "type": "string",
+      "enum": ["ltr", "rtl"],
+      "default": "ltr"
+    },
+    "path": {
+      "type": "string",
+      "description": "Canonical public path derived from page identity and locale"
+    },
     "title": { "type": "string" },
     "slug": { "type": "string" },
+    "navigation_label": { "type": "string" },
+    "hero_eyebrow": { "type": "string" },
+    "hero_heading": { "type": "string" },
+    "hero_body": { "type": "string" },
+    "primary_cta_label": { "type": "string" },
+    "primary_cta_url": { "type": "string" },
     "content": { "type": "string" },
+    "content_blocks": {
+      "type": "array",
+      "description": "Ordered, independent editorial and canonical-data presentation blocks",
+      "items": {
+        "type": "object",
+        "properties": {
+          "block_key": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["rich_text", "faq", "cta", "offer_grid", "trainer_grid", "schedule", "lead_form"]
+          },
+          "heading": { "type": "string" },
+          "body": { "type": "string" },
+          "cta_label": { "type": "string" },
+          "cta_url": { "type": "string" }
+        }
+      }
+    },
     "seo_title": { "type": "string" },
     "seo_description": { "type": "string" },
+    "workflow_status": {
+      "type": "string",
+      "enum": ["draft", "review", "approved", "published"],
+      "default": "draft"
+    },
+    "editorial_notes": { "type": "string" },
+    "source_reference": { "type": "string" },
+    "version": { "type": "number", "default": 1, "minimum": 1 },
+    "approved_by": { "type": "string" },
+    "approved_at": { "type": "string", "format": "date-time" },
+    "published_at": { "type": "string", "format": "date-time" },
     "is_published": { "type": "boolean", "default": false }
   },
   "required": ["title", "slug", "content"],
   "rls": {
     "create": { "user_condition": { "role": "admin" } },
-    "read": true,
+    "read": {
+      "$or": [
+        { "data.is_published": true },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
     "update": { "user_condition": { "role": "admin" } },
     "delete": { "user_condition": { "role": "admin" } }
   }

@@ -4,6 +4,7 @@ import { getAttribution } from "@/lib/attribution";
 import { track, EVENTS, HAS_WHATSAPP, whatsappUrl } from "@/lib/site";
 import { Send, Loader2, Check } from "lucide-react";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
+import { uiText } from "@/lib/uiTranslations";
 
 export default function LeadForm({
   leadType = "contact",
@@ -11,11 +12,15 @@ export default function LeadForm({
   service = "",
   trainer = "",
   sourcePage = "",
-  title = "Request Information",
+  title,
   subtitle = "",
-  ctaLabel = "Submit Request",
+  ctaLabel,
   variant = "default",
+  locale = "en",
 }) {
+  const text = uiText(locale);
+  const displayTitle = title ?? text.actions.requestInfo;
+  const displayCta = ctaLabel ?? text.actions.submit;
   const [form, setForm] = useState({
     name: "", email: "", phone: "", whatsapp: "", message: "",
   });
@@ -46,7 +51,7 @@ export default function LeadForm({
       track(EVENTS.leadSubmit, { lead_type: leadType, product, trainer, source: sourcePage });
       setDone(true);
     } catch (err) {
-      setError(err.response?.data?.error || "Something went wrong. Please try again.");
+      setError(locale === "en" ? (err.response?.data?.error || text.form.error) : text.form.error);
     } finally {
       setLoading(false);
     }
@@ -58,12 +63,12 @@ export default function LeadForm({
         <div className="w-14 h-14 rounded-full bg-gold/15 flex items-center justify-center mx-auto mb-4">
           <Check className="w-7 h-7 text-gold" />
         </div>
-        <h3 className="font-heading text-2xl text-white mb-2">Request Received</h3>
-        <p className="text-white/55 text-sm mb-5">Our team will reach out using the contact details you provided.</p>
+        <h3 className="font-heading text-2xl text-white mb-2">{text.form.successTitle}</h3>
+        <p className="text-white/55 text-sm mb-5">{text.form.successBody}</p>
         {HAS_WHATSAPP && <a href={whatsappUrl("Hi, I just submitted a request on your website.")} target="_blank" rel="noreferrer"
           onClick={() => track(EVENTS.whatsappClick, { location: "lead_form_success" })}
           className="inline-flex items-center gap-2 bg-gold text-obsidian font-heading px-6 py-3 clip-tag">
-          <WhatsAppIcon className="w-4 h-4" /> Open WhatsApp
+          <WhatsAppIcon className="w-4 h-4" /> {text.form.openWhatsApp}
         </a>}
       </div>
     );
@@ -77,17 +82,17 @@ export default function LeadForm({
         <label htmlFor="website">Website</label>
         <input id="website" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
       </div>
-      {title && <h3 className="font-heading text-2xl text-white">{title}</h3>}
+      {displayTitle && <h3 className="font-heading text-2xl text-white">{displayTitle}</h3>}
       {subtitle && <p className="text-white/55 text-sm">{subtitle}</p>}
       <div className="grid sm:grid-cols-2 gap-3">
-        <input aria-label="Full name" autoComplete="name" required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Full name" className={fieldCls} />
-        <input aria-label="Phone" autoComplete="tel" type="tel" required value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="Phone" className={fieldCls} />
+        <input aria-label={text.form.name} autoComplete="name" required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={text.form.name} className={fieldCls} />
+        <input aria-label={text.form.phone} autoComplete="tel" type="tel" required value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder={text.form.phone} className={fieldCls} />
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
-        <input aria-label="Email" autoComplete="email" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="Email" className={fieldCls} />
-        <input aria-label="WhatsApp number" autoComplete="tel" type="tel" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="WhatsApp number" className={fieldCls} />
+        <input aria-label={text.form.email} autoComplete="email" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder={text.form.email} className={fieldCls} />
+        <input aria-label={text.form.whatsapp} autoComplete="tel" type="tel" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder={text.form.whatsapp} className={fieldCls} />
       </div>
-      <textarea aria-label="Message" rows={variant === "compact" ? 2 : 3} value={form.message} onChange={(e) => set("message", e.target.value)} placeholder="Message (optional)" className={fieldCls} />
+      <textarea aria-label={text.form.message} rows={variant === "compact" ? 2 : 3} value={form.message} onChange={(e) => set("message", e.target.value)} placeholder={text.form.message} className={fieldCls} />
       {error && <p role="alert" className="text-red-400 text-sm">{error}</p>}
       <button
         type="submit"
@@ -95,7 +100,7 @@ export default function LeadForm({
         className="w-full inline-flex items-center justify-center gap-2 bg-gold text-obsidian font-heading tracking-wide py-3.5 hover:brightness-110 disabled:opacity-60 transition-all clip-tag"
       >
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-        {ctaLabel}
+        {displayCta}
       </button>
     </form>
   );

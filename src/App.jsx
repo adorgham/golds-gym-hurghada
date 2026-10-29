@@ -30,6 +30,7 @@ const Register = lazy(() => import('@/pages/Register'));
 const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const LegalPage = lazy(() => import('@/pages/LegalPage'));
+const LanguageEditionPage = lazy(() => import('@/pages/LanguageEditionPage'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -83,6 +84,11 @@ const AuthenticatedApp = () => {
         <Route path="/fitness-tips/:slug" element={<ArticleDetail section="fitness-tips" />} />
         <Route path="/privacy" element={<LegalPage slug="privacy" />} />
         <Route path="/terms" element={<LegalPage slug="terms" />} />
+        <Route path="/:locale" element={<LanguageEditionPage pageKey="home" />} />
+        <Route path="/:locale/memberships" element={<LanguageEditionPage pageKey="memberships" />} />
+        <Route path="/:locale/passes" element={<LanguageEditionPage pageKey="passes" />} />
+        <Route path="/:locale/personal-training" element={<LanguageEditionPage pageKey="personal_training" />} />
+        <Route path="/:locale/classes/schedule" element={<LanguageEditionPage pageKey="class_schedule" />} />
       </Route>
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/admin" element={<Admin />} />

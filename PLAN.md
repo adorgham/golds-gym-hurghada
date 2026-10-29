@@ -153,6 +153,43 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 
 **Status:** In progress. The owner confirmed `https://www.goldsgymhurgahda.co` as the future canonical production domain on 2026-10-27. Indexing remains disabled until the controlled Sprint 6 cutover.
 
+### Multilingual Step 1 — technical foundation
+
+**Status:** Implemented locally; production rendering gate remains pending until the custom-domain release candidate exists.
+
+- Stable launch locales are `en`, `ar`, `de` and `ru`; English remains unprefixed and Arabic is RTL.
+- Five stable page identities map deterministically to 20 candidate language-edition routes. The executable contract is validated by `npm run test:localization`.
+- Language content is modeled as independent editions, not synchronized translations. No English fallback is allowed on an indexable localized URL.
+- Base44's platform-managed crawler prerendering is the selected launch path. A framework migration or parallel renderer is deferred unless the production-domain crawler test fails.
+- Localized routes, CMS schema changes and content imports are intentionally excluded from Step 1 and remain unpublished.
+- Before enabling indexing, test normal browser output, crawler-rendered HTML, localized SEO tags, sitemap/robots ownership and unknown-route HTTP behavior on the confirmed custom domain.
+
+### Multilingual Step 2 — CMS foundation
+
+**Status:** Implemented locally; Base44 schema diff review and synchronization remain pending.
+
+- `SitePage` remains the single CMS entity and now supports one independent record per deterministic `page_key + locale` edition.
+- Ordered edition blocks support editorial sections, FAQs, CTAs and references to canonical offers, trainers and schedules without copying authoritative commercial data.
+- The admin separates launch language editions from legacy About, Facilities, Privacy and Terms pages so existing workflows remain available.
+- EN, AR, DE and RU editions have independent draft, review, approved and published states, version increments and approval metadata.
+- Duplicate page/locale editions are rejected by the admin. Import reconciliation uses the deterministic `edition_key`; the remote backend does not yet enforce a database uniqueness constraint.
+- Draft/review editions are intended for administrators only. The local schema changes `SitePage` public read access to published records while retaining administrator access to all editions.
+- Before schema synchronization, inventory/export any remote `SitePage` records and explicitly set `is_published` on approved legacy records. Records with an unset publication flag will no longer be anonymously readable after this RLS change.
+- Content import, localized public routes and production publication remain excluded from Step 2.
+
+### Multilingual Step 3 — localized website runtime
+
+**Status:** Implemented locally; populated UAT remains blocked on the Step 2 Base44 schema gate and approved published editions.
+
+- Added route families for the five agreed page identities under `/ar`, `/de` and `/ru`; `/en/*` redirects to the existing unprefixed English route.
+- Existing English pages and presentation remain unchanged.
+- Localized routes load only their exact published `edition_key`; they never fall back to English content. Missing, unsupported or unpublished editions render the localized noindex not-found state.
+- The application updates document `lang` and `dir`; Arabic editions render RTL, including editorial Markdown and CMS editing direction.
+- Navigation, language switching, mobile actions, footer interface labels, enquiry forms and system states have EN/AR/DE/RU interface text.
+- The language switcher preserves the corresponding page identity and exposes only English plus published CMS editions.
+- Edition blocks render independent editorial copy, FAQs, CTAs and enquiry forms. Canonical offer, trainer and schedule blocks read the existing shared entities instead of copying commercial or operational records.
+- Localized URLs remain excluded from generated sitemaps until approved editions exist. Reciprocal hreflang and language-aware sitemap generation remain Step 4 work.
+
 ### Scope
 
 - `REQUIRED NOW`: metadata, canonicals, structured data, sitemap, robots rules, internal links, analytics event contract and campaign attribution verification.

@@ -3,8 +3,11 @@ import { Link, useLocation, NavLink } from "react-router-dom";
 import { Menu, X, ChevronDown, MapPin } from "lucide-react";
 import { track, EVENTS } from "@/lib/site";
 import GoldsLogo from "@/components/GoldsLogo";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { localeFromPath, localizedPath } from "@/lib/localization";
+import { uiText } from "@/lib/uiTranslations";
 
-const NAV = [
+const ENGLISH_NAV = [
   { label: "Memberships", to: "/memberships" },
   { label: "Passes", to: "/passes" },
   { label: "Classes", to: "/classes/schedule" },
@@ -25,6 +28,16 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [fitOpen, setFitOpen] = useState(false);
   const loc = useLocation();
+  const locale = localeFromPath(loc.pathname);
+  const text = uiText(locale);
+  const homePath = localizedPath("home", locale);
+  const membershipsPath = localizedPath("memberships", locale);
+  const nav = locale === "en" ? ENGLISH_NAV : [
+    { label: text.nav.memberships, to: localizedPath("memberships", locale) },
+    { label: text.nav.passes, to: localizedPath("passes", locale) },
+    { label: text.nav.class_schedule, to: localizedPath("class_schedule", locale) },
+    { label: text.nav.personal_training, to: localizedPath("personal_training", locale) },
+  ];
 
   useEffect(() => {
     setOpen(false);
@@ -40,6 +53,9 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   return (
@@ -60,12 +76,12 @@ export default function Navbar() {
             <button
               className="lg:hidden text-white p-1 -ml-1"
               onClick={() => setOpen(true)}
-              aria-label="Open menu"
+              aria-label={text.actions.openMenu}
             >
               <Menu className="w-6 h-6" />
             </button>
             <nav className="hidden lg:flex items-center gap-0.5">
-              {NAV.slice(0, 3).map((n) => (
+              {nav.slice(0, 3).map((n) => (
                 <NavLink
                   key={n.to}
                   to={n.to}
@@ -78,7 +94,7 @@ export default function Navbar() {
                   {n.label}
                 </NavLink>
               ))}
-              <div className="relative" onMouseEnter={() => setFitOpen(true)} onMouseLeave={() => setFitOpen(false)}>
+              {locale === "en" && <div className="relative" onMouseEnter={() => setFitOpen(true)} onMouseLeave={() => setFitOpen(false)}>
                 <button className="px-3 py-2 text-[13px] font-heading tracking-[0.08em] uppercase text-white/80 hover:text-gold flex items-center gap-1">
                   Fitness <ChevronDown className="w-3.5 h-3.5" />
                 </button>
@@ -97,19 +113,19 @@ export default function Navbar() {
                     </div>
                   </div>
                 )}
-              </div>
+              </div>}
             </nav>
           </div>
 
           {/* Center: logo */}
-          <Link to="/" className="flex items-center justify-center" aria-label="Gold's Gym Hurghada home">
+          <Link to={homePath} className="flex items-center justify-center" aria-label={`Gold's Gym Hurghada — ${text.nav.home}`}>
             <GoldsLogo variant="full" size={46} />
           </Link>
 
           {/* Right: nav + find a club */}
           <div className="flex items-center gap-1 flex-1 justify-end">
             <nav className="hidden lg:flex items-center gap-0.5">
-              {NAV.slice(3).map((n) => (
+              {nav.slice(3).map((n) => (
                 <NavLink
                   key={n.to}
                   to={n.to}
@@ -123,20 +139,21 @@ export default function Navbar() {
                 </NavLink>
               ))}
             </nav>
-            <Link
+            <LanguageSwitcher />
+            {locale === "en" && <Link
               to="/contact"
               onClick={() => track(EVENTS.membershipSelect, { location: "navbar_find" })}
               className="hidden sm:inline-flex items-center gap-1.5 text-gold font-heading text-[12px] tracking-[0.1em] uppercase px-3 py-2 hover:brightness-125 transition-all"
             >
               <MapPin className="w-3.5 h-3.5" />
               FIND A CLUB
-            </Link>
+            </Link>}
             <Link
-              to="/memberships"
+              to={membershipsPath}
               onClick={() => track(EVENTS.membershipSelect, { location: "navbar" })}
               className="hidden sm:inline-flex items-center bg-gold text-obsidian font-heading text-[13px] tracking-[0.08em] px-5 py-2.5 hover:brightness-110 transition-all clip-tag"
             >
-              JOIN NOW
+              {text.actions.join}
             </Link>
           </div>
         </div>
@@ -149,12 +166,12 @@ export default function Navbar() {
           <div className="relative h-full flex flex-col pt-6 px-6">
             <div className="flex items-center justify-between mb-10">
               <GoldsLogo variant="full" size={36} />
-              <button onClick={() => setOpen(false)} aria-label="Close menu" className="text-white">
+              <button onClick={() => setOpen(false)} aria-label={text.actions.closeMenu} className="text-white">
                 <X className="w-7 h-7" />
               </button>
             </div>
             <nav className="flex flex-col gap-1">
-              {NAV.map((n, i) => (
+              {nav.map((n, i) => (
                 <Link
                   key={n.to}
                   to={n.to}
@@ -164,18 +181,19 @@ export default function Navbar() {
                   {n.label}
                 </Link>
               ))}
-              <div className="mt-4 mb-2 text-xs tracking-[0.3em] text-gold font-semibold">FITNESS</div>
-              {FITNESS_LINKS.map((f) => (
+              {locale === "en" && <div className="mt-4 mb-2 text-xs tracking-[0.3em] text-gold font-semibold">FITNESS</div>}
+              {locale === "en" && FITNESS_LINKS.map((f) => (
                 <Link key={f.to} to={f.to} className="text-lg text-white/70 py-1.5 hover:text-gold font-heading tracking-[0.04em] uppercase">
                   {f.label}
                 </Link>
               ))}
             </nav>
+            <LanguageSwitcher mobile />
             <Link
-              to="/memberships"
+              to={membershipsPath}
               className="mt-auto mb-8 text-center bg-gold text-obsidian font-heading text-lg tracking-[0.08em] py-4 clip-tag"
             >
-              JOIN NOW
+              {text.actions.join}
             </Link>
           </div>
         </div>

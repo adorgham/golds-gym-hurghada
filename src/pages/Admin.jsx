@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useSeo } from "@/lib/seo";
-import { Users, Calendar, FileText, Image, UserCog, TrendingUp, Mail, Scale } from "lucide-react";
+import { Users, Calendar, FileText, Image, Languages, UserCog, TrendingUp, Mail, Scale } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import MembersSection from "@/components/admin/MembersSection";
 import MediaLibrary from "@/components/admin/MediaLibrary";
 import ContentManager, { CONTENT_CONFIG } from "@/components/admin/ContentManager";
+import LanguageEditionManager from "@/components/admin/LanguageEditionManager";
 import ScheduleManager from "@/components/admin/ScheduleManager";
+import { isLanguageEdition } from "@/lib/pageEditions";
 
 const TABS = [
   { id: "leads", label: "Leads", icon: Mail },
@@ -19,6 +21,7 @@ const TABS = [
   { id: "media", label: "Media", icon: Image },
   { id: "passes", label: "Passes", icon: Users },
   { id: "articles", label: "Content", icon: FileText },
+  { id: "editions", label: "Languages", icon: Languages },
   { id: "pages", label: "Pages", icon: Scale },
 ];
 
@@ -86,7 +89,8 @@ export default function Admin() {
     media: data.media?.length || 0,
     passes: data.passes?.length || 0,
     articles: data.articles?.length || 0,
-    pages: data.pages?.length || 0,
+    editions: data.pages?.filter(isLanguageEdition).length || 0,
+    pages: data.pages?.filter((page) => !isLanguageEdition(page)).length || 0,
   };
 
   if (user?.role !== "admin") {
@@ -104,7 +108,7 @@ export default function Admin() {
           <Link to="/" className="text-sm text-gold hover:underline">← Back to site</Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-3 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-11 gap-3 mb-8">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex flex-col items-center gap-1 p-4 border transition-all ${tab === t.id ? "border-gold bg-gold/10" : "border-white/10 hover:border-gold/50"}`}>
@@ -173,7 +177,9 @@ export default function Admin() {
 
             {tab === "articles" && <ContentManager {...CONTENT_CONFIG.articles} items={data.articles} onChange={(items) => setData((current) => ({ ...current, articles: items }))} />}
 
-            {tab === "pages" && <ContentManager {...CONTENT_CONFIG.pages} items={data.pages} onChange={(items) => setData((current) => ({ ...current, pages: items }))} />}
+            {tab === "editions" && <LanguageEditionManager items={data.pages} user={user} onChange={(items) => setData((current) => ({ ...current, pages: items }))} />}
+
+            {tab === "pages" && <ContentManager {...CONTENT_CONFIG.pages} items={data.pages.filter((page) => !isLanguageEdition(page))} onChange={(items) => setData((current) => ({ ...current, pages: [...current.pages.filter(isLanguageEdition), ...items] }))} />}
           </div>
         )}
       </div>

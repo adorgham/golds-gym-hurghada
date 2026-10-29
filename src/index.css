@@ -149,6 +149,11 @@
   .prose-content ol { margin: 1rem 0; padding-left: 1.5rem; }
   .prose-content ol li { list-style: decimal; padding-left: 0; }
   .prose-content ol li::before { content: none; }
+  [dir="rtl"] .prose-content ul { padding-left: 0; padding-right: 1.25rem; }
+  [dir="rtl"] .prose-content li { padding-left: 0; padding-right: 1rem; }
+  [dir="rtl"] .prose-content li::before { left: auto; right: 0; }
+  [dir="rtl"] .prose-content ol { padding-left: 0; padding-right: 1.5rem; }
+  [dir="rtl"] .prose-content ol li { padding-right: 0; }
   @keyframes scaleIn {
     from { opacity: 0; transform: scale(0.94); }
     to { opacity: 1; transform: scale(1); }
