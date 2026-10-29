@@ -166,7 +166,7 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 
 ### Multilingual Step 2 — CMS foundation
 
-**Status:** Implemented locally; Base44 schema diff review and synchronization remain pending.
+**Status:** Implemented locally; the read-only production inventory and schema diff gate passed on 2026-10-29. Synchronization awaits explicit approval because the full-sync operation will remove an empty legacy lowercase `member` schema duplicate.
 
 - `SitePage` remains the single CMS entity and now supports one independent record per deterministic `page_key + locale` edition.
 - Ordered edition blocks support editorial sections, FAQs, CTAs and references to canonical offers, trainers and schedules without copying authoritative commercial data.
@@ -175,6 +175,7 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 - Duplicate page/locale editions are rejected by the admin. Import reconciliation uses the deterministic `edition_key`; the remote backend does not yet enforce a database uniqueness constraint.
 - Draft/review editions are intended for administrators only. The local schema changes `SitePage` public read access to published records while retaining administrator access to all editions.
 - Before schema synchronization, inventory/export any remote `SitePage` records and explicitly set `is_published` on approved legacy records. Records with an unset publication flag will no longer be anonymously readable after this RLS change.
+- The production audit found zero `SitePage` records, so no legacy page records require publication-state migration. Fourteen local schemas match production exactly; `SitePage` is the only intended change. Production also contains empty `member` and `Member` schema keys, and standard synchronization is expected to remove the lowercase duplicate.
 - Content import, localized public routes and production publication remain excluded from Step 2.
 
 ### Multilingual Step 3 — localized website runtime
