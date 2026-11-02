@@ -6,6 +6,7 @@ import {
   editionIdentity,
   editionKey,
   editionSlug,
+  canPublishEdition,
   isLanguageEdition,
   normalizeEditionBlocks,
 } from "../src/lib/pageEditions.js";
@@ -25,6 +26,10 @@ assert.deepEqual(editionIdentity("class_schedule", "ru"), {
 });
 assert.equal(isLanguageEdition({ page_key: "home", locale: "de" }), true);
 assert.equal(isLanguageEdition({ slug: "privacy" }), false);
+assert.equal(canPublishEdition("draft"), false);
+assert.equal(canPublishEdition("review"), false);
+assert.equal(canPublishEdition("approved"), true);
+assert.equal(canPublishEdition("published"), true);
 
 const blocks = normalizeEditionBlocks([
   { block_key: "intro", type: "rich_text", heading: "Train", body: "Move better." },

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,6 +10,7 @@ import {
   PAGE_BLOCK_TYPES,
   PAGE_EDITION_STATUSES,
   PAGE_IDENTITY_OPTIONS,
+  canPublishEdition,
   editionBlocksToMarkdown,
   editionIdentity,
   isLanguageEdition,
@@ -18,6 +20,10 @@ import {
 const pageOrder = new Map(PAGE_IDENTITY_OPTIONS.map((page, index) => [page.value, index]));
 const localeOrder = new Map(SUPPORTED_LOCALES.map((locale, index) => [locale, index]));
 const EMPTY_ITEMS = Object.freeze([]);
+
+function previewPath(item) {
+  return `/${item.locale}/admin/editions/${item.id}/preview`;
+}
 
 function createBlock(type = "rich_text") {
   const suffix = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -32,11 +38,13 @@ function statusClass(status) {
   if (status === "published") return "bg-green-500/15 text-green-300";
   if (status === "approved") return "bg-blue-500/15 text-blue-300";
   if (status === "review") return "bg-amber-500/15 text-amber-300";
-  return "bg-white/10 text-white/55";
+  return "bg-white/15 text-white/80";
 }
 
 export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onChange }) {
   const [editing, setEditing] = useState(null);
+  const [initialEditing, setInitialEditing] = useState(null);
+  const [pendingWorkflowChange, setPendingWorkflowChange] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -46,10 +54,12 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
       .sort((a, b) => (pageOrder.get(a.page_key) - pageOrder.get(b.page_key)) || (localeOrder.get(a.locale) - localeOrder.get(b.locale))),
     [items],
   );
+  const hasUnsavedChanges = Boolean(editing && initialEditing && editing !== initialEditing);
+  const initialWorkflowStatus = initialEditing?.workflow_status || (initialEditing?.is_published ? "published" : "draft");
 
   const openCreate = () => {
     setError("");
-    setEditing({
+    const next = {
       ...editionIdentity("home", "en"),
       title: "",
       navigation_label: "",
@@ -66,18 +76,29 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
       source_reference: "",
       version: 1,
       isNew: true,
-    });
+    };
+    setEditing(next);
+    setInitialEditing(next);
   };
 
   const openEdit = (item) => {
     setError("");
-    setEditing({
+    const next = {
       ...item,
       ...editionIdentity(item.page_key, item.locale),
       workflow_status: item.workflow_status || (item.is_published ? "published" : "draft"),
       content_blocks: normalizeEditionBlocks(item.content_blocks),
       isNew: false,
-    });
+    };
+    setEditing(next);
+    setInitialEditing(next);
+  };
+
+  const closeEditor = () => {
+    if (hasUnsavedChanges && !window.confirm("Discard the unsaved edition changes?")) return;
+    setEditing(null);
+    setInitialEditing(null);
+    setError("");
   };
 
   const updateField = (name, value) => setEditing((current) => ({ ...current, [name]: value }));
@@ -112,32 +133,44 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
     content_blocks: current.content_blocks.filter((_, blockIndex) => blockIndex !== index),
   }));
 
-  const save = async (event) => {
-    event.preventDefault();
+  const preparePayload = () => {
     const blocks = normalizeEditionBlocks(editing.content_blocks);
     const status = editing.workflow_status || "draft";
     const duplicate = editions.find((item) => item.id !== editing.id && item.page_key === editing.page_key && item.locale === editing.locale);
 
     if (duplicate) {
       setError(`${LOCALES[editing.locale].label} already has a ${editing.page_key.replace(/_/g, " ")} edition.`);
-      return;
+      return null;
     }
     if (!editing.title.trim() || !editing.hero_heading.trim()) {
       setError("Edition title and hero heading are required.");
-      return;
+      return null;
     }
     if (blocks.length === 0) {
       setError("Add at least one content block before saving the edition.");
-      return;
+      return null;
     }
     if (["approved", "published"].includes(status) && (!editing.seo_title.trim() || !editing.seo_description.trim())) {
       setError("Approved and published editions require an SEO title and description.");
-      return;
+      return null;
+    }
+    if (status === "published" && !canPublishEdition(initialWorkflowStatus)) {
+      setError("Save this edition as Approved first, then reopen it to publish. Draft and review editions cannot be published directly.");
+      return null;
+    }
+    if (status === "published" && editing.primary_cta_label.trim() && !editing.primary_cta_url.trim()) {
+      setError("The primary CTA destination must be approved before publishing.");
+      return null;
+    }
+    const incompleteBlockCta = blocks.find((block) => Boolean(block.cta_label) !== Boolean(block.cta_url));
+    if (status === "published" && incompleteBlockCta) {
+      setError("Every published block CTA must include both a label and a destination.");
+      return null;
     }
 
     const now = new Date().toISOString();
     const identity = editionIdentity(editing.page_key, editing.locale);
-    const payload = {
+    return {
       ...identity,
       title: editing.title.trim(),
       navigation_label: editing.navigation_label.trim(),
@@ -161,6 +194,9 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
       } : {}),
       ...(status === "published" ? { published_at: editing.published_at || now } : {}),
     };
+  };
+
+  const persist = async (payload) => {
 
     setSaving(true);
     setError("");
@@ -173,11 +209,29 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
         onChange(items.map((item) => item.id === editing.id ? { ...item, ...payload, ...updated } : item));
       }
       setEditing(null);
+      setInitialEditing(null);
+      setPendingWorkflowChange(null);
     } catch (cause) {
       setError(cause.message || "Could not save the language edition.");
     } finally {
       setSaving(false);
     }
+  };
+
+  const save = async (event) => {
+    event.preventDefault();
+    setError("");
+    const payload = preparePayload();
+    if (!payload) return;
+    if (payload.workflow_status === "published") {
+      setPendingWorkflowChange({ action: "publish", payload });
+      return;
+    }
+    if (initialWorkflowStatus === "published") {
+      setPendingWorkflowChange({ action: "unpublish", payload });
+      return;
+    }
+    await persist(payload);
   };
 
   const remove = async (item) => {
@@ -218,6 +272,7 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
                 <td className="p-3"><span className={`inline-flex px-2 py-1 text-[10px] font-semibold uppercase tracking-wide ${statusClass(item.workflow_status || (item.is_published ? "published" : "draft"))}`}>{workflowLabel(item.workflow_status || (item.is_published ? "published" : "draft"))}</span></td>
                 <td className="p-3"><div className="flex justify-end gap-1">
                   <Button size="icon" variant="ghost" title="Edit edition" onClick={() => openEdit(item)}><Pencil /></Button>
+                  <Button size="icon" variant="ghost" title="Preview saved edition" asChild><Link to={previewPath(item)} target="_blank" rel="noreferrer"><Eye /></Link></Button>
                   <Button size="icon" variant="ghost" title="Delete edition" onClick={() => remove(item)}><Trash2 /></Button>
                 </div></td>
               </tr>
@@ -227,7 +282,7 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
         </table>
       </div>
 
-      <Dialog open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
+      <Dialog open={Boolean(editing)} onOpenChange={(open) => !open && closeEditor()}>
         <DialogContent className="max-h-[94vh] max-w-5xl overflow-y-auto border-white/15 bg-obsidian text-white">
           <DialogHeader>
             <DialogTitle>{editing?.isNew ? "Add language edition" : "Edit language edition"}</DialogTitle>
@@ -238,8 +293,8 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
             {error && <p className="rounded bg-red-500/15 p-3 text-sm text-red-300" role="alert">{error}</p>}
 
             <section className="grid gap-4 border border-white/10 p-4 sm:grid-cols-2">
-              <SelectField label="Page identity" value={editing.page_key} options={PAGE_IDENTITY_OPTIONS} onChange={(value) => updateIdentity("page_key", value)} />
-              <SelectField label="Language" value={editing.locale} options={SUPPORTED_LOCALES.map((locale) => ({ value: locale, label: LOCALES[locale].label }))} onChange={(value) => updateIdentity("locale", value)} />
+              <SelectField label="Page identity" value={editing.page_key} options={PAGE_IDENTITY_OPTIONS} disabled={!editing.isNew} onChange={(value) => updateIdentity("page_key", value)} />
+              <SelectField label="Language" value={editing.locale} options={SUPPORTED_LOCALES.map((locale) => ({ value: locale, label: LOCALES[locale].label }))} disabled={!editing.isNew} onChange={(value) => updateIdentity("locale", value)} />
               <ReadOnlyField label="Edition key" value={editing.edition_key} />
               <ReadOnlyField label="Canonical path" value={editing.path} />
             </section>
@@ -252,7 +307,7 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
               <TextAreaField label="Hero body" value={editing.hero_body} rows={4} onChange={(value) => updateField("hero_body", value)} />
               <div className="grid content-start gap-4 sm:grid-cols-2">
                 <TextField label="Primary CTA label" value={editing.primary_cta_label} onChange={(value) => updateField("primary_cta_label", value)} />
-                <TextField label="Primary CTA path" value={editing.primary_cta_url} onChange={(value) => updateField("primary_cta_url", value)} />
+                <TextField label="Primary CTA path" value={editing.primary_cta_url} direction="ltr" onChange={(value) => updateField("primary_cta_url", value)} />
               </div>
             </section>
 
@@ -278,7 +333,7 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
                     <TextAreaField label={block.type === "faq" ? "Answer" : "Body (Markdown)"} value={block.body} rows={5} onChange={(value) => updateBlock(index, "body", value)} />
                     <div className="grid content-start gap-4 sm:grid-cols-2">
                       <TextField label="Block CTA label" value={block.cta_label} onChange={(value) => updateBlock(index, "cta_label", value)} />
-                      <TextField label="Block CTA path" value={block.cta_url} onChange={(value) => updateBlock(index, "cta_url", value)} />
+                      <TextField label="Block CTA path" value={block.cta_url} direction="ltr" onChange={(value) => updateBlock(index, "cta_url", value)} />
                     </div>
                   </div>
                 </div>
@@ -288,29 +343,54 @@ export default function LanguageEditionManager({ items = EMPTY_ITEMS, user, onCh
             <section className="grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-2" dir={editing.direction}>
               <TextField label="SEO title" value={editing.seo_title} onChange={(value) => updateField("seo_title", value)} />
               <TextAreaField label="SEO description" value={editing.seo_description} rows={3} onChange={(value) => updateField("seo_description", value)} />
-              <SelectField label="Workflow status" value={editing.workflow_status} options={PAGE_EDITION_STATUSES.map((status) => ({ value: status, label: workflowLabel(status) }))} onChange={(value) => updateField("workflow_status", value)} />
-              <TextField label="Source reference" value={editing.source_reference} onChange={(value) => updateField("source_reference", value)} />
+              <SelectField label="Workflow status" value={editing.workflow_status} options={PAGE_EDITION_STATUSES.map((status) => ({ value: status, label: workflowLabel(status), disabled: status === "published" && !canPublishEdition(initialWorkflowStatus) }))} onChange={(value) => updateField("workflow_status", value)} />
+              <TextField label="Source reference" value={editing.source_reference} direction="ltr" onChange={(value) => updateField("source_reference", value)} />
               <TextAreaField label="Editorial notes" value={editing.editorial_notes} rows={3} onChange={(value) => updateField("editorial_notes", value)} />
               <ReadOnlyField label="Version after save" value={`v${editing.isNew ? 1 : Number(editing.version || 1) + 1}`} />
             </section>
 
-            <div className="flex justify-end gap-2 border-t border-white/10 pt-4" dir="ltr">
-              <Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-              <Button disabled={saving} className="bg-gold text-obsidian hover:bg-gold/90">{saving ? "Saving…" : "Save edition"}</Button>
+            <div className="sticky -bottom-6 z-20 -mx-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/15 bg-obsidian/95 px-6 py-4 shadow-[0_-12px_24px_rgba(0,0,0,0.35)] backdrop-blur" dir="ltr">
+              <div className="text-xs"><span className={hasUnsavedChanges ? "font-semibold text-amber-300" : "text-white/45"}>{hasUnsavedChanges ? "Unsaved changes" : "No unsaved changes"}</span><span className="ml-2 text-white/35">Saving creates {`v${editing.isNew ? 1 : Number(editing.version || 1) + 1}`}.</span></div>
+              <div className="flex items-center gap-2">
+                {!editing.isNew && <Button type="button" variant="outline" asChild><Link to={previewPath(editing)} target="_blank" rel="noreferrer"><Eye /> Preview saved</Link></Button>}
+                <Button type="button" variant="outline" onClick={closeEditor}>Cancel</Button>
+                <Button disabled={saving || !hasUnsavedChanges} className="bg-gold text-obsidian hover:bg-gold/90">{saving ? "Saving…" : editing.workflow_status === "published" ? "Review publication" : initialWorkflowStatus === "published" ? "Review unpublish" : "Save edition"}</Button>
+              </div>
             </div>
           </form>}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(pendingWorkflowChange)} onOpenChange={(open) => !open && setPendingWorkflowChange(null)}>
+        <DialogContent className="max-w-lg border-white/15 bg-obsidian text-white">
+          <DialogHeader>
+            <DialogTitle>{pendingWorkflowChange?.action === "unpublish" ? "Remove this edition from the public site?" : "Publish this language edition?"}</DialogTitle>
+            <DialogDescription className="space-y-3 text-white/60">
+              {pendingWorkflowChange?.action === "unpublish" ? <>
+                <span className="block"><strong className="text-white">{editing?.title}</strong> will stop being publicly available at <code className="text-gold" dir="ltr">{editing?.path}</code> immediately.</span>
+                <span className="block">Existing links and search results may lead visitors to the unavailable-page state.</span>
+              </> : <>
+                <span className="block">This will make <strong className="text-white">{editing?.title}</strong> available at <code className="text-gold" dir="ltr">{editing?.path}</code>. The saved content becomes public immediately.</span>
+                <span className="block">Confirm that management approval, native-language review, CTA destinations and canonical business facts are complete.</span>
+              </>}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" disabled={saving} onClick={() => setPendingWorkflowChange(null)}>Cancel</Button>
+            <Button type="button" disabled={saving} onClick={() => persist(pendingWorkflowChange.payload)} className="bg-gold text-obsidian hover:bg-gold/90">{saving ? "Saving…" : pendingWorkflowChange?.action === "unpublish" ? "Confirm unpublish" : "Confirm publish"}</Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>
   );
 }
 
-function SelectField({ label, value, options, onChange }) {
-  return <label className="space-y-1.5 text-sm text-white/70"><span>{label}</span><select value={value || ""} onChange={(event) => onChange(event.target.value)} className="w-full rounded-md border border-white/15 bg-obsidian px-3 py-2 text-sm text-white">{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>;
+function SelectField({ label, value, options, disabled = false, onChange }) {
+  return <label className="space-y-1.5 text-sm text-white/70"><span>{label}</span><select value={value || ""} disabled={disabled} onChange={(event) => onChange(event.target.value)} className="w-full rounded-md border border-white/15 bg-obsidian px-3 py-2 text-sm text-white disabled:cursor-not-allowed disabled:bg-white/[0.03] disabled:text-white/45">{options.map((option) => <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>)}</select></label>;
 }
 
-function TextField({ label, value, required = false, onChange }) {
-  return <label className="space-y-1.5 text-sm text-white/70"><span>{label}{required ? " *" : ""}</span><Input value={value || ""} required={required} onChange={(event) => onChange(event.target.value)} className="border-white/15 bg-transparent text-white" /></label>;
+function TextField({ label, value, required = false, direction = undefined, onChange }) {
+  return <label className="space-y-1.5 text-sm text-white/70"><span>{label}{required ? " *" : ""}</span><Input value={value || ""} required={required} dir={direction} onChange={(event) => onChange(event.target.value)} className="border-white/15 bg-transparent text-white" /></label>;
 }
 
 function TextAreaField({ label, value, rows, onChange }) {
@@ -318,5 +398,5 @@ function TextAreaField({ label, value, rows, onChange }) {
 }
 
 function ReadOnlyField({ label, value }) {
-  return <label className="space-y-1.5 text-sm text-white/70"><span>{label}</span><Input value={value || ""} readOnly className="border-white/10 bg-white/[0.03] font-mono text-xs text-white/50" /></label>;
+  return <label className="space-y-1.5 text-sm text-white/70"><span>{label}</span><Input value={value || ""} dir="ltr" readOnly className="border-white/10 bg-white/[0.03] font-mono text-xs text-white/50" /></label>;
 }

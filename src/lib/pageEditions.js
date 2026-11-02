@@ -52,6 +52,10 @@ export function isLanguageEdition(record) {
   return Boolean(record && PAGE_IDENTITIES[record.page_key] && isSupportedLocale(record.locale));
 }
 
+export function canPublishEdition(previousStatus) {
+  return previousStatus === "approved" || previousStatus === "published";
+}
+
 export function normalizeEditionBlocks(blocks) {
   if (!Array.isArray(blocks)) return [];
   const allowedTypes = new Set(PAGE_BLOCK_TYPES.map((type) => type.value));

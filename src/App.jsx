@@ -31,6 +31,7 @@ const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const LegalPage = lazy(() => import('@/pages/LegalPage'));
 const LanguageEditionPage = lazy(() => import('@/pages/LanguageEditionPage'));
+const LanguageEditionPreview = lazy(() => import('@/pages/LanguageEditionPreview'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -92,6 +93,9 @@ const AuthenticatedApp = () => {
       </Route>
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/admin" element={<Admin />} />
+        <Route element={<Layout />}>
+          <Route path="/:locale/admin/editions/:editionId/preview" element={<LanguageEditionPreview />} />
+        </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes></Suspense>

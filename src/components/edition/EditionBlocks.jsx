@@ -20,7 +20,7 @@ function InternalOrExternalLink({ to, className, children }) {
   return <Link to={to || "/"} className={className}>{children}</Link>;
 }
 
-export default function EditionBlocks({ blocks, locale, pageKey }) {
+export default function EditionBlocks({ blocks, locale, pageKey, interactive = true }) {
   return <div className="space-y-6 lg:space-y-8">
     {blocks.map((block) => {
       if (block.type === "rich_text") return <section key={block.block_key} className="border border-white/10 bg-white/[0.02] p-6 lg:p-10"><BlockHeading>{block.heading}</BlockHeading><div className="prose-content mt-4 max-w-none text-white/65"><ReactMarkdown>{block.body}</ReactMarkdown></div>{block.cta_label && block.cta_url && <EditionCta block={block} locale={locale} />}</section>;
@@ -29,10 +29,14 @@ export default function EditionBlocks({ blocks, locale, pageKey }) {
       if (block.type === "offer_grid") return <CanonicalOfferGrid key={block.block_key} block={block} locale={locale} pageKey={pageKey} />;
       if (block.type === "trainer_grid") return <CanonicalTrainerGrid key={block.block_key} block={block} locale={locale} />;
       if (block.type === "schedule") return <CanonicalScheduleSummary key={block.block_key} block={block} locale={locale} />;
-      if (block.type === "lead_form") return <section key={block.block_key} className="border border-white/10 bg-white/[0.02] p-6 lg:p-10"><LeadForm locale={locale} leadType={pageKey === "memberships" ? "membership" : pageKey === "passes" ? "pass" : pageKey === "personal_training" ? "trainer_booking" : "contact"} service={pageKey} title={block.heading || undefined} subtitle={block.body} ctaLabel={block.cta_label || undefined} /></section>;
+      if (block.type === "lead_form") return <section key={block.block_key} className="border border-white/10 bg-white/[0.02] p-6 lg:p-10">{interactive ? <LeadForm locale={locale} leadType={pageKey === "memberships" ? "membership" : pageKey === "passes" ? "pass" : pageKey === "personal_training" ? "trainer_booking" : "contact"} service={pageKey} title={block.heading || undefined} subtitle={block.body} ctaLabel={block.cta_label || undefined} /> : <LeadFormPreview block={block} />}</section>;
       return null;
     })}
   </div>;
+}
+
+function LeadFormPreview({ block }) {
+  return <div aria-label="Disabled form preview"><BlockHeading>{block.heading}</BlockHeading>{block.body && <p className="mt-3 max-w-3xl text-white/60">{block.body}</p>}<div className="mt-6 grid gap-4 sm:grid-cols-2" aria-hidden="true"><div className="h-11 border border-white/10 bg-white/[0.02]" /><div className="h-11 border border-white/10 bg-white/[0.02]" /><div className="h-24 border border-white/10 bg-white/[0.02] sm:col-span-2" /><div className="h-11 w-44 bg-gold/30 sm:col-span-2" /></div><p className="mt-4 text-xs font-semibold uppercase tracking-wide text-amber-300">Form submission disabled in administrator preview</p></div>;
 }
 
 function EditionCta({ block, locale }) {

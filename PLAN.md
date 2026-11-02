@@ -166,7 +166,7 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 
 ### Multilingual Step 2 — CMS foundation
 
-**Status:** Synchronized to production on 2026-10-29 after the read-only inventory and owner approval. The empty legacy lowercase `member` schema duplicate was removed. The XLSX-to-`SitePage` dry-run manifest passed on 2026-10-30; draft creation, editorial approval, publication and populated UAT remain pending.
+**Status:** Synchronized to production on 2026-10-29 after the read-only inventory and owner approval. The empty legacy lowercase `member` schema duplicate was removed. The XLSX-to-`SitePage` dry run passed and all 20 editions were created as draft/unpublished records on 2026-10-30. Read-only populated desktop administrator UAT passed on 2026-11-03 without changing any record; mobile-admin UAT, editorial approval and selective publication remain pending.
 
 - `SitePage` remains the single CMS entity and now supports one independent record per deterministic `page_key + locale` edition.
 - Ordered edition blocks support editorial sections, FAQs, CTAs and references to canonical offers, trainers and schedules without copying authoritative commercial data.
@@ -176,12 +176,13 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 - Draft/review editions are intended for administrators only. The local schema changes `SitePage` public read access to published records while retaining administrator access to all editions.
 - Before schema synchronization, inventory/export any remote `SitePage` records and explicitly set `is_published` on approved legacy records. Records with an unset publication flag will no longer be anonymously readable after this RLS change.
 - The production audit found zero `SitePage` records, so no legacy page records required publication-state migration. Synchronization updated `SitePage`, removed the confirmed-empty lowercase `member` duplicate and preserved the canonical `Member` entity and its records. The post-sync audit confirms all 15 production schemas exactly match the repository.
-- The 2026-10-30 workbook preflight produced 20 unique EN/AR/DE/RU payloads with zero validation errors. Every payload remains `draft` and unpublished; canonical offer, trainer and schedule blocks do not copy commercial or operational records. Sixteen non-home primary CTA destinations and all management/native-language approvals remain publication blockers.
-- Content import, localized public routes and production publication remain excluded from Step 2.
+- The 2026-10-30 workbook preflight produced 20 unique EN/AR/DE/RU payloads with zero validation errors. Production reconciliation confirmed all 20 records exactly match the manifest, with five editions per locale and four editions per page identity. Every record remains `draft` and unpublished; canonical offer, trainer and schedule blocks do not copy commercial or operational records.
+- Sixteen non-home primary CTA destinations and all management/native-language approvals remain publication blockers. Production publication remains excluded from Step 2.
+- Read-only populated administrator UAT confirmed all 20 editions are independently editable, Arabic content regions render RTL, and canonical membership/schedule blocks do not duplicate commercial or operational facts. Post-UAT reconciliation still found 20 version-1 draft/unpublished records with no approval or publication timestamps. Authenticated mobile-admin UAT remains pending.
 
 ### Multilingual Step 3 — localized website runtime
 
-**Status:** Implemented locally; the Base44 schema gate and content dry run have passed. Populated UAT remains blocked on creation and approval of unpublished editions, followed by selective publication.
+**Status:** Implemented locally; the Base44 schema gate, content dry run, unpublished draft creation and populated desktop administrator UAT have passed. A protected, noindex saved-draft preview and explicit publish/unpublish confirmation gate are now implemented locally and await post-push populated UAT. Editorial approval, CTA resolution, selective publication and authenticated mobile-admin UAT remain pending.
 
 - Added route families for the five agreed page identities under `/ar`, `/de` and `/ru`; `/en/*` redirects to the existing unprefixed English route.
 - Existing English pages and presentation remain unchanged.
@@ -191,6 +192,9 @@ The schedule resolver validation covers Cairo-week boundaries, date-only cancell
 - The language switcher preserves the corresponding page identity and exposes only English plus published CMS editions.
 - Edition blocks render independent editorial copy, FAQs, CTAs and enquiry forms. Canonical offer, trainer and schedule blocks read the existing shared entities instead of copying commercial or operational records.
 - Localized URLs remain excluded from generated sitemaps until approved editions exist. Reciprocal hreflang and language-aware sitemap generation remain Step 4 work.
+- Administrators can preview a saved edition through a protected, `noindex` route that uses the same rendering component as the public page. Lead submission is disabled in preview mode, so review cannot create production enquiries.
+- Draft and review editions cannot move directly to `published`: an edition must first be saved as `approved`, reopened, and explicitly confirmed for publication. Unpublishing also requires confirmation, and unresolved CTA labels block publication until they have destinations.
+- Existing edition identity and language fields are locked after creation; URL fields remain LTR inside Arabic editing; the long editor has a sticky save footer and visible unsaved-change state.
 
 ### Scope
 
